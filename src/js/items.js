@@ -173,10 +173,17 @@ function getRarityColor(rarity) {
 // Appraisal Mini-Game System
 let currentAppraisal = null;
 
-function startAppraisalMiniGame(item) {
+function startAppraisalMiniGame(itemId) {
+    // Find item in mystery queue
+    let item = gameState.mysteryItems.find(i => i.id === itemId);
+    if (!item) {
+        showNotification('❌ Item not found in appraisal queue');
+        return;
+    }
+    
     if (item.isAppraised) {
-        // Already appraised, just sell it
-        sellItem(item);
+        // Already appraised, move to stock
+        moveToStock(item);
         return;
     }
     
@@ -404,17 +411,17 @@ function finishAppraisal(wasSuccessful) {
     // Hide game modal
     document.getElementById('appraisal-game').classList.add('hidden');
     
-    // Update item in UI
-    updateItemInUI(currentAppraisal.item);
+    // Move appraised item to stock
+    const item = currentAppraisal.item;
+    moveToStock(item);
     
     // Show success message
-    const item = currentAppraisal.item;
     const value = getItemValue(item);
     
     if (wasSuccessful) {
-        showNotification(`✅ Correctly appraised ${item.name} for $${value}!`);
+        showNotification(`✅ Correctly appraised ${item.name} for $${value}! Moved to stock.`);
     } else {
-        showNotification(`🔍 ${item.name} appraised for $${value}`);
+        showNotification(`🔍 ${item.name} appraised for $${value}. Moved to stock.`);
     }
     
     // Reset appraisal state
@@ -448,8 +455,46 @@ function sellItem(item) {
     saveGameState();
 }
 
+// Generate premium item (higher chance of rare/epic)
+function generatePremiumItem() {
+    const category = getRandomCategory();
+    const rarity = getPremiumRarity(); // Different rarity distribution
+    const condition = getRandomCondition();
+    const template = getRandomItemTemplate(category, rarity);
+    
+    const item = {
+        id: Date.now() + Math.random(),
+        category: category,
+        rarity: rarity,
+        condition: condition,
+        name: template.name,
+        emoji: template.emoji,
+        baseValue: template.baseValue,
+        conditionMultiplier: CONDITIONS[condition].multiplier,
+        isAppraised: false,
+        isMystery: true // Premium items always need appraisal
+    };
+    
+    return item;
+}
+
+function getPremiumRarity() {
+    // Premium sources have better rarity distribution
+    const weights = { rare: 60, uncommon: 30, common: 10 }; // Much better odds
+    const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
+    let random = Math.random() * totalWeight;
+    
+    for (const [rarity, weight] of Object.entries(weights)) {
+        random -= weight;
+        if (random <= 0) return rarity;
+    }
+    
+    return 'rare'; // fallback
+}
+
 // Export functions for global use
 window.generateRandomItem = generateRandomItem;
+window.generatePremiumItem = generatePremiumItem;
 window.startAppraisalMiniGame = startAppraisalMiniGame;
 window.sellItem = sellItem;
 window.getItemValue = getItemValue;

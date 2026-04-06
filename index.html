@@ -18,116 +18,280 @@
             </div>
         </header>
 
-        <!-- Main Game Area -->
-        <main>
-            <!-- Offline Progress Modal -->
-            <div id="offline-modal" class="modal hidden">
-                <div class="modal-content">
-                    <h2>Welcome Back! 🎉</h2>
-                    <p id="offline-message">You were away for 2h 15m.</p>
-                    <div class="offline-rewards">
-                        <div class="reward">
-                            <span class="emoji">📦</span>
-                            <span id="offline-items">24</span> items arrived
-                        </div>
-                        <div class="reward">
-                            <span class="emoji">💰</span>
-                            <span id="offline-cash">$1,247</span> earned
-                        </div>
-                    </div>
-                    <button id="collect-offline" class="btn primary">Collect Rewards</button>
+        <!-- Main Layout Container -->
+        <div class="main-layout">
+            <!-- Left Sidebar Navigation -->
+            <nav class="sidebar">
+                <div class="nav-section">
+                    <h3>📦 Operations</h3>
+                    <button class="nav-btn active" data-section="donations">
+                        <span class="nav-icon">📦</span>
+                        <span class="nav-label">Donations</span>
+                    </button>
+                    <button class="nav-btn" data-section="appraisal">
+                        <span class="nav-icon">🔍</span>
+                        <span class="nav-label">Appraisal</span>
+                    </button>
+                    <button class="nav-btn" data-section="restoration">
+                        <span class="nav-icon">🔨</span>
+                        <span class="nav-label">Restoration</span>
+                    </button>
+                    <button class="nav-btn" data-section="stock">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-label">Stock</span>
+                    </button>
                 </div>
-            </div>
 
-            <!-- Current Items Section -->
-            <section class="items-section">
-                <h2>📦 Current Items (<span id="item-count">0</span>/50)</h2>
-                <div class="items-container" id="items-container">
-                    <!-- Items will be dynamically added here -->
+                <div class="nav-section">
+                    <h3>🏪 Store Front</h3>
+                    <button class="nav-btn" data-section="window-display">
+                        <span class="nav-icon">🪟</span>
+                        <span class="nav-label">Window Display</span>
+                    </button>
+                    <button class="nav-btn" data-section="vinyl">
+                        <span class="nav-icon">💿</span>
+                        <span class="nav-label">Vinyl Section</span>
+                    </button>
+                    <button class="nav-btn" data-section="clothing">
+                        <span class="nav-icon">👕</span>
+                        <span class="nav-label">Clothing Rack</span>
+                    </button>
+                    <button class="nav-btn" data-section="electronics">
+                        <span class="nav-icon">📻</span>
+                        <span class="nav-label">Electronics</span>
+                    </button>
                 </div>
+
+                <div class="nav-section">
+                    <h3>⚙️ Management</h3>
+                    <button class="nav-btn" data-section="upgrades">
+                        <span class="nav-icon">🛒</span>
+                        <span class="nav-label">Upgrades</span>
+                    </button>
+                    <button class="nav-btn" data-section="stats">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-label">Statistics</span>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <!-- Dynamic Content Sections -->
                 
-                <!-- Item Generation Status -->
-                <div class="generation-status">
-                    <div class="next-item">
-                        Next item in: <span id="next-item-timer">--</span>s
-                    </div>
-                    <div class="rate">
-                        Rate: 1 item every <span id="item-rate">30</span> seconds
-                    </div>
-                </div>
-            </section>
-
-            <!-- Appraisal Mini-Game -->
-            <div id="appraisal-game" class="mini-game hidden">
-                <div class="game-content">
-                    <h3>🔍 Appraise This Item</h3>
-                    <div class="item-preview">
-                        <img id="mystery-item-image" src="" alt="Mystery Item">
-                        <div class="examination-overlay">
-                            <div class="examine-spot" data-spot="maker" style="top: 20%; left: 80%;"></div>
-                            <div class="examine-spot" data-spot="condition" style="top: 70%; left: 30%;"></div>
-                            <div class="examine-spot" data-spot="age" style="top: 40%; left: 60%;"></div>
-                        </div>
-                    </div>
-                    <div class="examination-results">
-                        <div class="clue hidden" id="clue-maker">Maker's mark: "XYZ Company"</div>
-                        <div class="clue hidden" id="clue-condition">Condition: Good</div>
-                        <div class="clue hidden" id="clue-age">Era: 1980s</div>
-                    </div>
-                    <div class="appraisal-question">
-                        <p>What is this item worth?</p>
-                        <div class="value-options">
-                            <button class="value-btn" data-value="low">$5-15</button>
-                            <button class="value-btn" data-value="medium">$25-50</button>
-                            <button class="value-btn" data-value="high">$75-150</button>
-                        </div>
-                    </div>
-                    <div class="mini-game-timer">
-                        Time: <span id="appraisal-timer">30</span>s
-                    </div>
-                </div>
-            </div>
-
-            <!-- Upgrade Shop -->
-            <section class="shop-section">
-                <h2>🛒 Upgrades</h2>
-                <div class="upgrades">
-                    <div class="upgrade" data-upgrade="speed">
-                        <div class="upgrade-info">
-                            <h3>⚡ Faster Item Flow</h3>
-                            <p>Items arrive 20% faster</p>
-                        </div>
-                        <div class="upgrade-cost">$<span>50</span></div>
-                        <button class="btn">Buy</button>
+                <!-- Donations Section -->
+                <section id="donations-section" class="content-section active">
+                    <div class="section-header">
+                        <h2>📦 Donations Center</h2>
+                        <p>Source items from various donation streams</p>
                     </div>
                     
-                    <div class="upgrade" data-upgrade="storage">
-                        <div class="upgrade-info">
-                            <h3>📦 More Storage</h3>
-                            <p>+10 item storage capacity</p>
+                    <div class="donation-controls">
+                        <div class="source-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="auto-donations" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-label">Auto-Receive Donations</span>
+                            </label>
+                            <p class="toggle-help">When enabled, items arrive automatically</p>
                         </div>
-                        <div class="upgrade-cost">$<span>100</span></div>
-                        <button class="btn">Buy</button>
+                        
+                        <div class="manual-controls">
+                            <button class="btn primary" id="manual-search">🔍 Search for Items</button>
+                            <button class="btn" id="estate-sale">🏠 Check Estate Sales</button>
+                            <button class="btn" id="garage-sale">🚗 Browse Garage Sales</button>
+                        </div>
                     </div>
-
-                    <div class="upgrade" data-upgrade="auto-common">
-                        <div class="upgrade-info">
-                            <h3>🤖 Auto-Appraise Commons</h3>
-                            <p>Automatically identify common items</p>
+                    
+                    <div class="donation-queue">
+                        <h3>📥 Recent Donations</h3>
+                        <div id="donation-items" class="donation-grid">
+                            <!-- Donation items appear here -->
                         </div>
-                        <div class="upgrade-cost">$<span>200</span></div>
-                        <button class="btn">Buy</button>
+                    </div>
+                </section>
+
+                <!-- Appraisal Section -->
+                <section id="appraisal-section" class="content-section">
+                    <div class="section-header">
+                        <h2>🔍 Appraisal Workshop</h2>
+                        <p>Identify and evaluate your mystery items</p>
+                    </div>
+                    
+                    <div class="appraisal-workspace">
+                        <div class="mystery-items">
+                            <h3>❓ Items Awaiting Appraisal</h3>
+                            <div id="mystery-queue" class="items-grid">
+                                <!-- Mystery items appear here -->
+                            </div>
+                        </div>
+                        
+                        <div class="appraisal-tools">
+                            <h3>🛠️ Appraisal Tools</h3>
+                            <button class="tool-btn" data-tool="magnifier">🔍 Magnifying Glass</button>
+                            <button class="tool-btn" data-tool="blacklight">💡 UV Light</button>
+                            <button class="tool-btn" data-tool="scale">⚖️ Precision Scale</button>
+                            <button class="tool-btn" data-tool="reference">📚 Reference Guide</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Stock Section -->
+                <section id="stock-section" class="content-section">
+                    <div class="section-header">
+                        <h2>📋 Stock Warehouse</h2>
+                        <p>Manage your inventory and storage</p>
+                    </div>
+                    
+                    <div class="stock-overview">
+                        <div class="storage-stats">
+                            <div class="stat-card">
+                                <span class="stat-number" id="stock-count">0</span>
+                                <span class="stat-label">Items in Stock</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number" id="storage-capacity">50</span>
+                                <span class="stat-label">Storage Capacity</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number" id="estimated-value">$0</span>
+                                <span class="stat-label">Total Value</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="inventory-grid" id="inventory-display">
+                        <!-- All inventory items displayed here -->
+                    </div>
+                </section>
+
+                <!-- Window Display Section -->
+                <section id="window-display-section" class="content-section">
+                    <div class="section-header">
+                        <h2>🪟 Window Display</h2>
+                        <p>Showcase your best items to attract customers</p>
+                    </div>
+                    
+                    <div class="window-showcase">
+                        <div class="display-slots">
+                            <div class="display-slot" data-slot="1">
+                                <span class="slot-label">Spotlight Item</span>
+                                <div class="slot-content">Drop item here</div>
+                            </div>
+                            <div class="display-slot" data-slot="2">
+                                <span class="slot-label">Featured Set</span>
+                                <div class="slot-content">Drop item here</div>
+                            </div>
+                            <div class="display-slot" data-slot="3">
+                                <span class="slot-label">Eye Catcher</span>
+                                <div class="slot-content">Drop item here</div>
+                            </div>
+                        </div>
+                        
+                        <div class="display-bonuses">
+                            <h3>🌟 Current Bonuses</h3>
+                            <div class="bonus-list">
+                                <div class="bonus-item">No bonuses active</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Upgrades Section -->
+                <section id="upgrades-section" class="content-section">
+                    <div class="section-header">
+                        <h2>🛒 Shop Upgrades</h2>
+                        <p>Improve your operations and capabilities</p>
+                    </div>
+                    
+                    <div class="upgrades-grid">
+                        <div class="upgrade-card" data-upgrade="storage">
+                            <div class="upgrade-icon">📦</div>
+                            <h3>Storage Expansion</h3>
+                            <p>Increase warehouse capacity by 10 items</p>
+                            <div class="upgrade-cost">$<span>100</span></div>
+                            <button class="btn">Upgrade</button>
+                        </div>
+                        
+                        <div class="upgrade-card" data-upgrade="auto-donations">
+                            <div class="upgrade-icon">🤖</div>
+                            <h3>Auto-Donation Network</h3>
+                            <p>Automatically receive donation items</p>
+                            <div class="upgrade-cost">$<span>250</span></div>
+                            <button class="btn">Upgrade</button>
+                        </div>
+                        
+                        <div class="upgrade-card" data-upgrade="appraisal-tools">
+                            <div class="upgrade-icon">🔍</div>
+                            <h3>Professional Tools</h3>
+                            <p>Faster and more accurate appraisals</p>
+                            <div class="upgrade-cost">$<span>200</span></div>
+                            <button class="btn">Upgrade</button>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+
+        <!-- Modals and Overlays -->
+        
+        <!-- Offline Progress Modal -->
+        <div id="offline-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Welcome Back! 🎉</h2>
+                <p id="offline-message">You were away for 2h 15m.</p>
+                <div class="offline-rewards">
+                    <div class="reward">
+                        <span class="emoji">📦</span>
+                        <span id="offline-items">24</span> items arrived
+                    </div>
+                    <div class="reward">
+                        <span class="emoji">💰</span>
+                        <span id="offline-cash">$1,247</span> earned
                     </div>
                 </div>
-            </section>
-        </main>
+                <button id="collect-offline" class="btn primary">Collect Rewards</button>
+            </div>
+        </div>
+
+        <!-- Appraisal Mini-Game -->
+        <div id="appraisal-game" class="mini-game hidden">
+            <div class="game-content">
+                <h3>🔍 Appraise This Item</h3>
+                <div class="item-preview">
+                    <img id="mystery-item-image" src="" alt="Mystery Item">
+                    <div class="examination-overlay">
+                        <div class="examine-spot" data-spot="maker" style="top: 20%; left: 80%;"></div>
+                        <div class="examine-spot" data-spot="condition" style="top: 70%; left: 30%;"></div>
+                        <div class="examine-spot" data-spot="age" style="top: 40%; left: 60%;"></div>
+                    </div>
+                </div>
+                <div class="examination-results">
+                    <div class="clue hidden" id="clue-maker">Maker's mark: "XYZ Company"</div>
+                    <div class="clue hidden" id="clue-condition">Condition: Good</div>
+                    <div class="clue hidden" id="clue-age">Era: 1980s</div>
+                </div>
+                <div class="appraisal-question">
+                    <p>What is this item worth?</p>
+                    <div class="value-options">
+                        <button class="value-btn" data-value="low">$5-15</button>
+                        <button class="value-btn" data-value="medium">$25-50</button>
+                        <button class="value-btn" data-value="high">$75-150</button>
+                    </div>
+                </div>
+                <div class="mini-game-timer">
+                    Time: <span id="appraisal-timer">30</span>s
+                </div>
+            </div>
+        </div>
 
         <!-- Footer -->
         <footer>
             <div class="debug-info">
                 <button id="save-btn" class="btn small">💾 Save</button>
                 <button id="reset-btn" class="btn small">🔄 Reset</button>
-                <span class="version">MVP v0.1</span>
+                <span class="version">MVP v2.0 - Sidebar Edition</span>
             </div>
         </footer>
     </div>

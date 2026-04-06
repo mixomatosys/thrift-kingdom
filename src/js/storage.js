@@ -4,6 +4,38 @@
 const SAVE_KEY = 'thriftKingdomSave';
 const SAVE_VERSION = '1.0';
 
+// Helper functions for save/load
+function cleanItem(item) {
+    return {
+        id: item.id,
+        category: item.category,
+        rarity: item.rarity,
+        condition: item.condition,
+        name: item.name,
+        emoji: item.emoji,
+        baseValue: item.baseValue,
+        conditionMultiplier: item.conditionMultiplier,
+        isAppraised: item.isAppraised,
+        isMystery: item.isMystery
+    };
+}
+
+function restoreItem(item) {
+    // Ensure all required properties exist
+    return {
+        id: item.id || Date.now() + Math.random(),
+        category: item.category || 'housewares',
+        rarity: item.rarity || 'common',
+        condition: item.condition || 'good',
+        name: item.name || 'Unknown Item',
+        emoji: item.emoji || '❓',
+        baseValue: item.baseValue || 1,
+        conditionMultiplier: item.conditionMultiplier || 1,
+        isAppraised: item.isAppraised || false,
+        isMystery: item.isMystery !== false // Default to true if not specified
+    };
+}
+
 // Save game state to localStorage
 function saveGameState() {
     try {
@@ -20,30 +52,28 @@ function saveGameState() {
                 appraisalPrestige: gameState.appraisalPrestige || 0,
                 appraisalXPMultiplier: gameState.appraisalXPMultiplier || 1,
                 
-                // Items (with cleanup)
-                items: gameState.items.map(item => ({
-                    id: item.id,
-                    category: item.category,
-                    rarity: item.rarity,
-                    condition: item.condition,
-                    name: item.name,
-                    emoji: item.emoji,
-                    baseValue: item.baseValue,
-                    conditionMultiplier: item.conditionMultiplier,
-                    isAppraised: item.isAppraised,
-                    isMystery: item.isMystery
-                })),
+                // Items - separated by area
+                donationQueue: gameState.donationQueue.map(cleanItem),
+                mysteryItems: gameState.mysteryItems.map(cleanItem),
+                stockItems: gameState.stockItems.map(cleanItem),
+                displayItems: gameState.displayItems.map(cleanItem),
                 
                 // Storage and generation
                 storageCapacity: gameState.storageCapacity,
                 itemGenerationRate: gameState.itemGenerationRate,
                 lastItemGeneration: gameState.lastItemGeneration,
                 
+                // Game settings
+                autoDonations: gameState.autoDonations,
+                currentSection: gameState.currentSection,
+                
                 // Upgrades
                 upgrades: {
                     speed: gameState.upgrades.speed,
                     storage: gameState.upgrades.storage,
-                    autoCommon: gameState.upgrades.autoCommon
+                    autoCommon: gameState.upgrades.autoCommon,
+                    autoDonations: gameState.upgrades.autoDonations,
+                    appraisalTools: gameState.upgrades.appraisalTools
                 },
                 
                 // Special unlocks
@@ -104,33 +134,34 @@ function loadGameState() {
         gameState.appraisalPrestige = saved.appraisalPrestige || 0;
         gameState.appraisalXPMultiplier = saved.appraisalXPMultiplier || 1;
         
-        // Items
-        gameState.items = (saved.items || []).map(item => {
-            // Ensure all required properties exist
-            return {
-                id: item.id || Date.now() + Math.random(),
-                category: item.category || 'housewares',
-                rarity: item.rarity || 'common',
-                condition: item.condition || 'good',
-                name: item.name || 'Unknown Item',
-                emoji: item.emoji || '❓',
-                baseValue: item.baseValue || 1,
-                conditionMultiplier: item.conditionMultiplier || 1,
-                isAppraised: item.isAppraised || false,
-                isMystery: item.isMystery !== false // Default to true if not specified
-            };
-        });
+        // Items - separated by area
+        gameState.donationQueue = (saved.donationQueue || []).map(restoreItem);
+        gameState.mysteryItems = (saved.mysteryItems || []).map(restoreItem);
+        gameState.stockItems = (saved.stockItems || []).map(restoreItem);
+        gameState.displayItems = (saved.displayItems || []).map(restoreItem);
+        
+        // Migrate old save format if needed
+        if (saved.items && saved.items.length > 0) {
+            // Old format - migrate items to donation queue
+            gameState.donationQueue = saved.items.map(restoreItem);
+        }
         
         // Storage and generation
         gameState.storageCapacity = saved.storageCapacity || 50;
         gameState.itemGenerationRate = saved.itemGenerationRate || 30;
         gameState.lastItemGeneration = saved.lastItemGeneration || Date.now();
         
+        // Game settings
+        gameState.autoDonations = saved.autoDonations !== false; // Default to true
+        gameState.currentSection = saved.currentSection || 'donations';
+        
         // Upgrades
         gameState.upgrades = {
             speed: saved.upgrades?.speed || 0,
             storage: saved.upgrades?.storage || 0,
-            autoCommon: saved.upgrades?.autoCommon || false
+            autoCommon: saved.upgrades?.autoCommon || false,
+            autoDonations: saved.upgrades?.autoDonations || false,
+            appraisalTools: saved.upgrades?.appraisalTools || false
         };
         
         // Special unlocks
@@ -161,15 +192,27 @@ function initializeFreshGame() {
     gameState.cash = 0;
     gameState.appraisalLevel = 1;
     gameState.appraisalXP = 0;
-    gameState.items = [];
+    
+    // Initialize separated item arrays
+    gameState.donationQueue = [];
+    gameState.mysteryItems = [];
+    gameState.stockItems = [];
+    gameState.displayItems = [];
+    
     gameState.storageCapacity = 50;
     gameState.itemGenerationRate = 30;
     gameState.lastItemGeneration = Date.now();
+    gameState.autoDonations = true;
+    gameState.currentSection = 'donations';
+    
     gameState.upgrades = {
         speed: 0,
         storage: 0,
-        autoCommon: false
+        autoCommon: false,
+        autoDonations: false,
+        appraisalTools: false
     };
+    
     gameState.isPlaying = true;
     gameState.lastSave = Date.now();
     gameState.achievements = {};

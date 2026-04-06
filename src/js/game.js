@@ -10,25 +10,33 @@ let gameState = {
     appraisalLevel: 1,
     appraisalXP: 0,
     
-    // Items
-    items: [],
+    // Items - now separated into different areas
+    donationQueue: [],      // Items from donation sources
+    mysteryItems: [],       // Items needing appraisal  
+    stockItems: [],         // Appraised items in warehouse
+    displayItems: [],       // Items in window display
+    
     storageCapacity: 50,
     
     // Game Settings  
     itemGenerationRate: 30, // seconds between items
     lastItemGeneration: Date.now(),
     lastSave: Date.now(),
+    autoDonations: true,    // Auto-receive toggle
     
     // Upgrades
     upgrades: {
         speed: 0,        // Faster item generation
         storage: 0,      // More storage capacity
-        autoCommon: false // Auto-appraise common items
+        autoCommon: false, // Auto-appraise common items
+        autoDonations: false, // Auto-donation network
+        appraisalTools: false // Professional tools
     },
     
     // Game State
     isPlaying: true,
-    currentAppraisalItem: null
+    currentAppraisalItem: null,
+    currentSection: 'donations' // Track current section
 };
 
 // Game Configuration
@@ -167,8 +175,14 @@ function canGenerateItem() {
     const timeSinceLastItem = (now - gameState.lastItemGeneration) / 1000;
     const requiredTime = getCurrentItemRate();
     
+    // Calculate total items across all areas
+    const totalItems = gameState.donationQueue.length + 
+                      gameState.mysteryItems.length + 
+                      gameState.stockItems.length + 
+                      gameState.displayItems.length;
+    
     return timeSinceLastItem >= requiredTime && 
-           gameState.items.length < gameState.storageCapacity;
+           totalItems < gameState.storageCapacity;
 }
 
 function getCurrentItemRate() {
@@ -180,13 +194,16 @@ function getCurrentItemRate() {
 
 function generateNewItem() {
     const newItem = generateRandomItem();
-    gameState.items.push(newItem);
+    gameState.donationQueue.push(newItem);
     gameState.lastItemGeneration = Date.now();
     
-    // Update UI
-    addItemToUI(newItem);
+    // Update UI if we're on donations section
+    if (gameState.currentSection === 'donations') {
+        updateDonationsSection();
+    }
     updateUI();
     
+    showNotification(`📦 New donation: ${newItem.name}`);
     console.log(`📦 New item generated: ${newItem.name} (${newItem.rarity})`);
 }
 
@@ -213,6 +230,43 @@ function updateNextItemTimer() {
 }
 
 function setupEventListeners() {
+    // Sidebar navigation
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const section = e.target.closest('.nav-btn').dataset.section;
+            switchToSection(section);
+        });
+    });
+    
+    // Donation controls
+    const autoToggle = document.getElementById('auto-donations');
+    if (autoToggle) {
+        autoToggle.addEventListener('change', (e) => {
+            gameState.autoDonations = e.target.checked;
+            if (gameState.autoDonations) {
+                startItemGeneration();
+                showNotification('🤖 Auto-donations enabled');
+            } else {
+                stopItemGeneration();
+                showNotification('✋ Auto-donations disabled');
+            }
+            saveGameState();
+        });
+    }
+    
+    // Manual donation buttons
+    document.getElementById('manual-search')?.addEventListener('click', () => {
+        searchForItems();
+    });
+    
+    document.getElementById('estate-sale')?.addEventListener('click', () => {
+        checkEstateSale();
+    });
+    
+    document.getElementById('garage-sale')?.addEventListener('click', () => {
+        browseGarageSale();
+    });
+    
     // Offline modal
     document.getElementById('collect-offline')?.addEventListener('click', () => {
         document.getElementById('offline-modal').classList.add('hidden');
@@ -231,12 +285,145 @@ function setupEventListeners() {
     });
     
     // Upgrade buttons
-    document.querySelectorAll('.upgrade button').forEach(btn => {
+    document.querySelectorAll('.upgrade-card button').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            const upgradeType = e.target.closest('.upgrade').dataset.upgrade;
+            const upgradeType = e.target.closest('.upgrade-card').dataset.upgrade;
             purchaseUpgrade(upgradeType);
         });
     });
+}
+
+// Section switching functionality
+function switchToSection(sectionName) {
+    // Hide all sections
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Remove active state from all nav buttons
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show target section
+    const targetSection = document.getElementById(`${sectionName}-section`);
+    if (targetSection) {
+        targetSection.classList.add('active');
+    }
+    
+    // Activate nav button
+    const targetBtn = document.querySelector(`[data-section="${sectionName}"]`);
+    if (targetBtn) {
+        targetBtn.classList.add('active');
+    }
+    
+    // Update section-specific content
+    updateSectionContent(sectionName);
+    
+    console.log(`📱 Switched to section: ${sectionName}`);
+}
+
+// Update content when switching sections
+function updateSectionContent(sectionName) {
+    switch(sectionName) {
+        case 'donations':
+            updateDonationsSection();
+            break;
+        case 'appraisal':
+            updateAppraisalSection();
+            break;
+        case 'stock':
+            updateStockSection();
+            break;
+        case 'window-display':
+            updateWindowDisplaySection();
+            break;
+        case 'upgrades':
+            updateUpgradesSection();
+            break;
+    }
+}
+
+// Manual item sourcing functions
+function searchForItems() {
+    if (gameState.cash < 10) {
+        showNotification('💸 Need $10 to search for items!');
+        return;
+    }
+    
+    gameState.cash -= 10;
+    const itemsFound = Math.floor(Math.random() * 3) + 1; // 1-3 items
+    
+    for (let i = 0; i < itemsFound; i++) {
+        const item = generateRandomItem();
+        gameState.items.push(item);
+    }
+    
+    showNotification(`🔍 Found ${itemsFound} items for $10!`);
+    updateUI();
+    saveGameState();
+}
+
+function checkEstateSale() {
+    if (gameState.cash < 25) {
+        showNotification('💸 Need $25 to access estate sales!');
+        return;
+    }
+    
+    gameState.cash -= 25;
+    const premium = Math.random() < 0.7; // 70% chance of premium item
+    const item = premium ? generatePremiumItem() : generateRandomItem();
+    
+    gameState.items.push(item);
+    
+    const type = premium ? 'premium' : 'regular';
+    showNotification(`🏠 Found a ${type} item at the estate sale!`);
+    updateUI();
+    saveGameState();
+}
+
+function browseGarageSale() {
+    if (gameState.cash < 5) {
+        showNotification('💸 Need $5 to browse garage sales!');
+        return;
+    }
+    
+    gameState.cash -= 5;
+    const itemsFound = Math.floor(Math.random() * 4) + 2; // 2-5 items
+    
+    for (let i = 0; i < itemsFound; i++) {
+        const item = generateRandomItem();
+        // Garage sale items are more likely to be rough condition
+        if (Math.random() < 0.6) {
+            item.condition = 'rough';
+            item.conditionMultiplier = CONDITIONS['rough'].multiplier;
+        }
+        gameState.items.push(item);
+    }
+    
+    showNotification(`🚗 Found ${itemsFound} items at garage sales!`);
+    updateUI();
+    saveGameState();
+}
+
+// Enhanced item generation control
+let itemGenerationInterval = null;
+
+function startItemGeneration() {
+    if (itemGenerationInterval) return; // Already running
+    
+    itemGenerationInterval = setInterval(() => {
+        if (gameState.autoDonations && canGenerateItem()) {
+            generateNewItem();
+        }
+    }, 1000);
+}
+
+function stopItemGeneration() {
+    if (itemGenerationInterval) {
+        clearInterval(itemGenerationInterval);
+        itemGenerationInterval = null;
+    }
 }
 
 function purchaseUpgrade(upgradeType) {
@@ -335,6 +522,223 @@ function showNotification(message) {
     }, 3000);
 }
 
+// Section update functions
+function updateDonationsSection() {
+    const container = document.getElementById('donation-items');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    gameState.donationQueue.forEach(item => {
+        const itemElement = createDonationItemCard(item);
+        container.appendChild(itemElement);
+    });
+    
+    // Update auto-donations toggle
+    const toggle = document.getElementById('auto-donations');
+    if (toggle) {
+        toggle.checked = gameState.autoDonations;
+    }
+}
+
+function updateAppraisalSection() {
+    const container = document.getElementById('mystery-queue');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    gameState.mysteryItems.forEach(item => {
+        const itemElement = createMysteryItemCard(item);
+        container.appendChild(itemElement);
+    });
+}
+
+function updateStockSection() {
+    // Update stats
+    document.getElementById('stock-count').textContent = gameState.stockItems.length;
+    document.getElementById('storage-capacity').textContent = gameState.storageCapacity;
+    
+    const totalValue = gameState.stockItems.reduce((sum, item) => sum + getItemValue(item), 0);
+    document.getElementById('estimated-value').textContent = `$${formatNumber(totalValue)}`;
+    
+    // Update inventory display
+    const container = document.getElementById('inventory-display');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    gameState.stockItems.forEach(item => {
+        const itemElement = createStockItemCard(item);
+        container.appendChild(itemElement);
+    });
+}
+
+function updateWindowDisplaySection() {
+    // Update display slots
+    gameState.displayItems.forEach((item, index) => {
+        const slot = document.querySelector(`[data-slot="${index + 1}"] .slot-content`);
+        if (slot && item) {
+            slot.innerHTML = `
+                <div class="display-item">
+                    <div class="item-emoji">${item.emoji}</div>
+                    <div class="item-name">${item.name}</div>
+                </div>
+            `;
+        }
+    });
+    
+    // Update bonuses (placeholder for now)
+    const bonusList = document.querySelector('.bonus-list');
+    if (bonusList) {
+        if (gameState.displayItems.length === 0) {
+            bonusList.innerHTML = '<div class="bonus-item">No bonuses active</div>';
+        } else {
+            bonusList.innerHTML = `
+                <div class="bonus-item">Display Bonus: +${gameState.displayItems.length * 5}% customer attraction</div>
+            `;
+        }
+    }
+}
+
+function updateUpgradesSection() {
+    // Update upgrade costs and availability
+    document.querySelectorAll('.upgrade-card').forEach(card => {
+        const upgradeType = card.dataset.upgrade;
+        const costElement = card.querySelector('.upgrade-cost span');
+        const button = card.querySelector('button');
+        
+        if (costElement && button) {
+            const cost = getUpgradeCost(upgradeType);
+            const canAfford = gameState.cash >= cost;
+            const isOwned = gameState.upgrades[upgradeType];
+            
+            costElement.textContent = isOwned ? 'OWNED' : formatNumber(cost);
+            button.textContent = isOwned ? 'Owned' : 'Upgrade';
+            button.disabled = !canAfford || isOwned;
+        }
+    });
+}
+
+// Item card creation functions
+function createDonationItemCard(item) {
+    const card = document.createElement('div');
+    card.className = 'item-card donation-item';
+    card.dataset.itemId = item.id;
+    
+    card.innerHTML = `
+        <div class="item-emoji">${item.emoji}</div>
+        <div class="item-name">${item.name}</div>
+        <div class="item-actions">
+            <button class="btn small" onclick="moveToAppraisal('${item.id}')">
+                🔍 Appraise
+            </button>
+        </div>
+    `;
+    
+    return card;
+}
+
+function createMysteryItemCard(item) {
+    const card = document.createElement('div');
+    card.className = 'item-card mystery-item';
+    card.dataset.itemId = item.id;
+    
+    card.innerHTML = `
+        <div class="item-emoji">❓</div>
+        <div class="item-name">Mystery ${item.category}</div>
+        <div class="item-actions">
+            <button class="btn small" onclick="startAppraisalMiniGame('${item.id}')">
+                🔍 Examine
+            </button>
+        </div>
+    `;
+    
+    return card;
+}
+
+function createStockItemCard(item) {
+    const card = document.createElement('div');
+    card.className = 'item-card stock-item';
+    card.dataset.itemId = item.id;
+    
+    card.innerHTML = `
+        <div class="item-emoji">${item.emoji}</div>
+        <div class="item-name">${item.name}</div>
+        <div class="item-value">$${getItemValue(item)}</div>
+        <div class="item-rarity" style="color: ${getRarityColor(item.rarity)}">
+            ${item.rarity.toUpperCase()}
+        </div>
+        <div class="item-actions">
+            <button class="btn small" onclick="moveToDisplay('${item.id}')">
+                🪟 Display
+            </button>
+            <button class="btn small" onclick="sellDirectly('${item.id}')">
+                💰 Sell
+            </button>
+        </div>
+    `;
+    
+    return card;
+}
+
+// Item movement functions
+function moveToAppraisal(itemId) {
+    const itemIndex = gameState.donationQueue.findIndex(item => item.id === itemId);
+    if (itemIndex === -1) return;
+    
+    const item = gameState.donationQueue.splice(itemIndex, 1)[0];
+    gameState.mysteryItems.push(item);
+    
+    updateUI();
+    showNotification(`📦 Moved ${item.name} to appraisal queue`);
+    saveGameState();
+}
+
+function moveToStock(item) {
+    // Remove from mystery items
+    const mysteryIndex = gameState.mysteryItems.findIndex(i => i.id === item.id);
+    if (mysteryIndex !== -1) {
+        gameState.mysteryItems.splice(mysteryIndex, 1);
+    }
+    
+    // Add to stock
+    gameState.stockItems.push(item);
+    
+    updateUI();
+    showNotification(`📋 ${item.name} moved to stock`);
+    saveGameState();
+}
+
+function moveToDisplay(itemId) {
+    const itemIndex = gameState.stockItems.findIndex(item => item.id === itemId);
+    if (itemIndex === -1) return;
+    
+    if (gameState.displayItems.length >= 3) {
+        showNotification('🪟 Display is full! Remove an item first.');
+        return;
+    }
+    
+    const item = gameState.stockItems.splice(itemIndex, 1)[0];
+    gameState.displayItems.push(item);
+    
+    updateUI();
+    showNotification(`🪟 ${item.name} added to window display`);
+    saveGameState();
+}
+
+function sellDirectly(itemId) {
+    const itemIndex = gameState.stockItems.findIndex(item => item.id === itemId);
+    if (itemIndex === -1) return;
+    
+    const item = gameState.stockItems.splice(itemIndex, 1)[0];
+    const value = getItemValue(item);
+    gameState.cash += value;
+    
+    updateUI();
+    showNotification(`💰 Sold ${item.name} for $${value}!`);
+    saveGameState();
+}
+
 function resetGame() {
     localStorage.removeItem('thriftKingdomSave');
     location.reload();
@@ -345,3 +749,8 @@ window.gameState = gameState;
 window.CONFIG = CONFIG;
 window.addXP = addXP;
 window.showNotification = showNotification;
+window.switchToSection = switchToSection;
+window.moveToAppraisal = moveToAppraisal;
+window.moveToStock = moveToStock;
+window.moveToDisplay = moveToDisplay;
+window.sellDirectly = sellDirectly;

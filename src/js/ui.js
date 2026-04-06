@@ -5,9 +5,7 @@
 
 function updateUI() {
     updateStats();
-    updateItemsDisplay();
-    updateUpgrades();
-    updateGenerationStatus();
+    updateSectionContent(gameState.currentSection);
 }
 
 function updateStats() {
@@ -34,21 +32,8 @@ function updateStats() {
 }
 
 function updateItemsDisplay() {
-    // Update item count
-    const itemCountElement = document.getElementById('item-count');
-    if (itemCountElement) {
-        itemCountElement.textContent = `${gameState.items.length}/${gameState.storageCapacity}`;
-    }
-    
-    // Clear and rebuild items container
-    const container = document.getElementById('items-container');
-    if (!container) return;
-    
-    container.innerHTML = '';
-    
-    gameState.items.forEach(item => {
-        addItemToUI(item, false); // false = don't animate since we're rebuilding
-    });
+    // This function is no longer needed with the new section-based approach
+    // Items are now displayed in their respective sections
 }
 
 function addItemToUI(item, animate = true) {
