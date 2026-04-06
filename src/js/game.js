@@ -28,6 +28,8 @@ let gameState = {
     
     // Donation flow management
     donationsOpen: false,      // Whether donations are open for business
+    nextDonationTime: 0,       // When next donation arrives
+    donationInterval: 60000,   // 60 seconds between donations
     
     storageCapacity: 50,
     
@@ -92,6 +94,7 @@ function initializeGame() {
     // Start game loops
     startItemGeneration();
     startUIUpdate();
+    startDonationTimer();
     
     // Setup event listeners
     setupEventListeners();
@@ -803,22 +806,22 @@ function toggleDonations() {
     if (gameState.donationsOpen) {
         // Close donations
         gameState.donationsOpen = false;
+        gameState.nextDonationTime = 0;
         updateDonationButton();
         showNotification('📦 Donation flow closed.');
     } else {
         // Open donations
         gameState.donationsOpen = true;
+        gameState.nextDonationTime = Date.now() + gameState.donationInterval;
         updateDonationButton();
         openDonations();
+        showNotification('📥 Donations open! First container generated, more every 60 seconds.');
     }
 }
 
 // Generate donation containers
 function openDonations() {
-    console.log('=== OPENING DONATIONS ===');
-    
-    // Clear existing containers
-    gameState.donationContainers = [];
+    console.log('=== GENERATING DONATION CONTAINERS ===');
     
     // Early level donation sources (common items only)
     const earlyDonationSources = [
@@ -870,10 +873,6 @@ function openDonations() {
     // Update the display using working method
     updateDonationContainers();
     
-    const statusEl = document.getElementById('donation-status');
-    if (statusEl) statusEl.textContent = `📦 ${numContainers} donation container${numContainers > 1 ? 's' : ''} arrived! Click to sort.`;
-    
-    showNotification(`📥 ${numContainers} new donation container${numContainers > 1 ? 's' : ''} arrived!`);
     saveGameState();
 }
 
@@ -1130,18 +1129,57 @@ function updateCategoryDisplay() {
 function updateDonationButton() {
     const button = document.getElementById('toggle-donations');
     const status = document.getElementById('donation-status');
+    const timer = document.getElementById('donation-timer');
     
     if (!button) return;
     
     if (gameState.donationsOpen) {
         button.textContent = '📦 Close Donations';
         button.classList.add('donations-open');
-        if (status) status.textContent = '🟢 Donations open! Click button to generate containers.';
+        if (timer) timer.style.display = 'block';
+        if (status) status.textContent = '🟢 Donations flowing! New containers arrive automatically every 60 seconds.';
     } else {
         button.textContent = '📥 Open Donations';
         button.classList.remove('donations-open');
+        if (timer) timer.style.display = 'none';
         if (status) status.textContent = 'Click to start receiving donation containers';
     }
+}
+
+function updateDonationTimer() {
+    if (!gameState.donationsOpen) return;
+    
+    const now = Date.now();
+    const timeLeft = Math.max(0, gameState.nextDonationTime - now);
+    const progress = Math.max(0, (gameState.donationInterval - timeLeft) / gameState.donationInterval * 100);
+    
+    // Update timer display
+    const timerProgress = document.getElementById('timer-progress');
+    const timerText = document.getElementById('timer-text');
+    
+    if (timerProgress) {
+        timerProgress.style.width = `${progress}%`;
+    }
+    
+    if (timerText) {
+        const seconds = Math.ceil(timeLeft / 1000);
+        timerText.textContent = `${seconds}s`;
+    }
+    
+    // Generate new container when timer expires
+    if (timeLeft <= 0 && gameState.donationsOpen) {
+        console.log('Timer expired, generating new container...');
+        openDonations(); // Generate new containers
+        gameState.nextDonationTime = now + gameState.donationInterval; // Reset timer
+        showNotification('📦 New donation container arrived!');
+        saveGameState();
+    }
+}
+
+function startDonationTimer() {
+    setInterval(() => {
+        updateDonationTimer();
+    }, 100); // Update every 100ms for smooth progress bar
 }
 
 // Export functions for use in other modules
