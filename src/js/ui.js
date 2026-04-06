@@ -13,6 +13,8 @@ function updateUI() {
 
 // Helper function - define first
 function createDonationContainer(container) {
+    console.log('Creating container element for:', container.title);
+    
     const containerElement = document.createElement('div');
     containerElement.className = 'donation-container';
     containerElement.dataset.containerId = container.id;
@@ -24,29 +26,37 @@ function createDonationContainer(container) {
         <div class="container-items">${container.itemCount} items</div>
     `;
     
-    containerElement.addEventListener('click', () => openDonationContainer(container));
+    containerElement.addEventListener('click', () => {
+        console.log('Container clicked:', container.title);
+        openDonationContainer(container);
+    });
     
+    console.log('Container element created successfully');
     return containerElement;
 }
 
 // New Donation System Functions
 
 function updateDonationDisplay() {
+    console.log('updateDonationDisplay called');
     const container = document.getElementById('donation-containers');
     if (!container) {
-        console.log('ERROR: donation-containers element not found');
+        console.error('ERROR: donation-containers element not found');
         return;
     }
     
-    console.log('Updating donation display, containers:', gameState.donationContainers);
+    console.log('Found container element, containers to display:', gameState.donationContainers);
     
     if (gameState.donationContainers && gameState.donationContainers.length > 0) {
+        console.log(`Displaying ${gameState.donationContainers.length} containers`);
         container.innerHTML = '';
-        gameState.donationContainers.forEach(donationContainer => {
+        gameState.donationContainers.forEach((donationContainer, index) => {
+            console.log(`Creating container ${index}:`, donationContainer.title);
             const containerElement = createDonationContainer(donationContainer);
             container.appendChild(containerElement);
         });
     } else {
+        console.log('No containers to display, showing placeholder');
         // Show placeholder when no containers
         container.innerHTML = `
             <div class="no-donations">

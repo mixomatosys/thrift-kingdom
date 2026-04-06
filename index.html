@@ -503,8 +503,9 @@
     <script src="src/js/storage.js"></script>
     
     <script>
-        // Initialize game on page load
-        window.addEventListener('load', () => {
+        // Initialize game when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, initializing game...');
             initializeGame();
         });
         

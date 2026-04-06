@@ -764,10 +764,18 @@ function resetGame() {
 // Donation System Functions
 
 function setupDonationEventListeners() {
+    console.log('Setting up donation event listeners...');
+    
     // Toggle Donations button
     const toggleDonationsBtn = document.getElementById('toggle-donations');
     if (toggleDonationsBtn) {
-        toggleDonationsBtn.addEventListener('click', toggleDonationFlow);
+        console.log('Found toggle button, adding listener');
+        toggleDonationsBtn.addEventListener('click', () => {
+            console.log('Toggle button clicked!');
+            toggleDonationFlow();
+        });
+    } else {
+        console.error('Toggle donations button not found!');
     }
     
     // Category sorting buttons
@@ -842,6 +850,8 @@ function closeDonationFlow() {
 }
 
 function generateDonationContainers() {
+    console.log('Generating donation containers...');
+    
     const containerTypes = [
         {
             icon: '📦',
@@ -868,6 +878,8 @@ function generateDonationContainers() {
     
     // Generate 1-3 containers
     const numContainers = Math.floor(Math.random() * 3) + 1;
+    console.log(`Generating ${numContainers} containers`);
+    
     for (let i = 0; i < numContainers; i++) {
         const template = containerTypes[Math.floor(Math.random() * containerTypes.length)];
         const container = {
@@ -876,8 +888,10 @@ function generateDonationContainers() {
             items: generateContainerItems(template.itemCount, template.quality)
         };
         gameState.donationContainers.push(container);
+        console.log('Created container:', container.title);
     }
     
+    console.log('Total containers now:', gameState.donationContainers.length);
     saveGameState();
 }
 
