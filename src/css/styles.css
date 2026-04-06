@@ -14,8 +14,7 @@ body {
 }
 
 #app {
-    max-width: 800px;
-    margin: 0 auto;
+    width: 100%;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -24,10 +23,11 @@ body {
 /* Header */
 header {
     background: rgba(255, 255, 255, 0.95);
-    padding: 1rem 1.5rem;
+    padding: 1rem 2rem;
     border-bottom: 3px solid #B8E6B8;
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
     backdrop-filter: blur(10px);
+    width: 100%;
 }
 
 header h1 {
@@ -140,7 +140,8 @@ header h1 {
     padding: 2rem 2.5rem;
     overflow-y: auto;
     background: rgba(255, 255, 255, 0.3);
-    min-width: 0; /* Allow shrinking */
+    min-width: 400px; /* Ensure enough space for content */
+    max-width: calc(100vw - 320px); /* Don't exceed viewport minus sidebar */
 }
 
 /* Content Sections */
@@ -908,7 +909,7 @@ footer {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .main-layout {
         flex-direction: column;
         height: auto;
@@ -924,6 +925,11 @@ footer {
         border-right: none;
         border-bottom: 3px solid #B8E6B8;
         padding: 1rem;
+    }
+    
+    .main-content {
+        min-width: auto;
+        max-width: none;
     }
     
     .nav-section {
