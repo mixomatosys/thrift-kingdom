@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thrift Kingdom - MVP</title>
+    <link rel="stylesheet" href="src/css/styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header>
+            <h1>🏪 Thrift Kingdom</h1>
+            <div class="stats">
+                <div class="cash">💰 $<span id="cash">0</span></div>
+                <div class="level">📊 Level <span id="level">1</span></div>
+                <div class="xp">XP: <span id="xp">0</span>/<span id="xp-needed">50</span></div>
+            </div>
+        </header>
+
+        <!-- Main Game Area -->
+        <main>
+            <!-- Offline Progress Modal -->
+            <div id="offline-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h2>Welcome Back! 🎉</h2>
+                    <p id="offline-message">You were away for 2h 15m.</p>
+                    <div class="offline-rewards">
+                        <div class="reward">
+                            <span class="emoji">📦</span>
+                            <span id="offline-items">24</span> items arrived
+                        </div>
+                        <div class="reward">
+                            <span class="emoji">💰</span>
+                            <span id="offline-cash">$1,247</span> earned
+                        </div>
+                    </div>
+                    <button id="collect-offline" class="btn primary">Collect Rewards</button>
+                </div>
+            </div>
+
+            <!-- Current Items Section -->
+            <section class="items-section">
+                <h2>📦 Current Items (<span id="item-count">0</span>/50)</h2>
+                <div class="items-container" id="items-container">
+                    <!-- Items will be dynamically added here -->
+                </div>
+                
+                <!-- Item Generation Status -->
+                <div class="generation-status">
+                    <div class="next-item">
+                        Next item in: <span id="next-item-timer">--</span>s
+                    </div>
+                    <div class="rate">
+                        Rate: 1 item every <span id="item-rate">30</span> seconds
+                    </div>
+                </div>
+            </section>
+
+            <!-- Appraisal Mini-Game -->
+            <div id="appraisal-game" class="mini-game hidden">
+                <div class="game-content">
+                    <h3>🔍 Appraise This Item</h3>
+                    <div class="item-preview">
+                        <img id="mystery-item-image" src="" alt="Mystery Item">
+                        <div class="examination-overlay">
+                            <div class="examine-spot" data-spot="maker" style="top: 20%; left: 80%;"></div>
+                            <div class="examine-spot" data-spot="condition" style="top: 70%; left: 30%;"></div>
+                            <div class="examine-spot" data-spot="age" style="top: 40%; left: 60%;"></div>
+                        </div>
+                    </div>
+                    <div class="examination-results">
+                        <div class="clue hidden" id="clue-maker">Maker's mark: "XYZ Company"</div>
+                        <div class="clue hidden" id="clue-condition">Condition: Good</div>
+                        <div class="clue hidden" id="clue-age">Era: 1980s</div>
+                    </div>
+                    <div class="appraisal-question">
+                        <p>What is this item worth?</p>
+                        <div class="value-options">
+                            <button class="value-btn" data-value="low">$5-15</button>
+                            <button class="value-btn" data-value="medium">$25-50</button>
+                            <button class="value-btn" data-value="high">$75-150</button>
+                        </div>
+                    </div>
+                    <div class="mini-game-timer">
+                        Time: <span id="appraisal-timer">30</span>s
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upgrade Shop -->
+            <section class="shop-section">
+                <h2>🛒 Upgrades</h2>
+                <div class="upgrades">
+                    <div class="upgrade" data-upgrade="speed">
+                        <div class="upgrade-info">
+                            <h3>⚡ Faster Item Flow</h3>
+                            <p>Items arrive 20% faster</p>
+                        </div>
+                        <div class="upgrade-cost">$<span>50</span></div>
+                        <button class="btn">Buy</button>
+                    </div>
+                    
+                    <div class="upgrade" data-upgrade="storage">
+                        <div class="upgrade-info">
+                            <h3>📦 More Storage</h3>
+                            <p>+10 item storage capacity</p>
+                        </div>
+                        <div class="upgrade-cost">$<span>100</span></div>
+                        <button class="btn">Buy</button>
+                    </div>
+
+                    <div class="upgrade" data-upgrade="auto-common">
+                        <div class="upgrade-info">
+                            <h3>🤖 Auto-Appraise Commons</h3>
+                            <p>Automatically identify common items</p>
+                        </div>
+                        <div class="upgrade-cost">$<span>200</span></div>
+                        <button class="btn">Buy</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="debug-info">
+                <button id="save-btn" class="btn small">💾 Save</button>
+                <button id="reset-btn" class="btn small">🔄 Reset</button>
+                <span class="version">MVP v0.1</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="src/js/game.js"></script>
+    <script src="src/js/items.js"></script>
+    <script src="src/js/skills.js"></script>
+    <script src="src/js/ui.js"></script>
+    <script src="src/js/storage.js"></script>
+    
+    <script>
+        // Initialize game on page load
+        window.addEventListener('load', () => {
+            initializeGame();
+        });
+        
+        // Auto-save on page unload
+        window.addEventListener('beforeunload', () => {
+            saveGameState();
+        });
+    </script>
+</body>
+</html>
