@@ -1012,6 +1012,34 @@ footer {
     }
 }
 
+/* Donation Flow Controls */
+.donation-flow-controls {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+    border: 2px solid #C4B5FD;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.flow-status {
+    color: #6B46C1;
+    margin: 1rem 0 0 0;
+    font-weight: 500;
+    font-style: italic;
+}
+
+.no-donations {
+    text-align: center;
+    color: #718096;
+    font-style: italic;
+    padding: 3rem 2rem;
+    background: rgba(247, 250, 252, 0.8);
+    border: 2px dashed #CBD5E0;
+    border-radius: 16px;
+    grid-column: 1 / -1;
+}
+
 /* New Donation Sorting Styles */
 .incoming-donations {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 248, 255, 0.95) 100%);
@@ -1162,10 +1190,91 @@ footer {
     text-align: center;
 }
 
+.placeholder-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+}
+
+.placeholder-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.placeholder-text {
+    color: #718096;
+    font-style: italic;
+    font-size: 1.1rem;
+}
+
 .sorting-decisions {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
+}
+
+.category-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.category-btn {
+    background: linear-gradient(135deg, #EDF2F7 0%, #E2E8F0 100%);
+    border-color: #CBD5E0;
+    color: #4A5568;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.category-btn:hover {
+    background: linear-gradient(135deg, #E2E8F0 0%, #CBD5E0 100%);
+    transform: translateY(-2px);
+}
+
+.category-btn[data-category="media"] {
+    background: linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%);
+    border-color: #F9A8D4;
+    color: #BE185D;
+}
+
+.category-btn[data-category="media"]:hover {
+    background: linear-gradient(135deg, #FCE7F3 0%, #F9A8D4 100%);
+}
+
+.category-btn[data-category="electronics"] {
+    background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+    border-color: #7DD3FC;
+    color: #0369A1;
+}
+
+.category-btn[data-category="electronics"]:hover {
+    background: linear-gradient(135deg, #E0F2FE 0%, #7DD3FC 100%);
+}
+
+.category-btn[data-category="clothing"] {
+    background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+    border-color: #86EFAC;
+    color: #166534;
+}
+
+.category-btn[data-category="clothing"]:hover {
+    background: linear-gradient(135deg, #DCFCE7 0%, #86EFAC 100%);
+}
+
+.category-btn[data-category="housewares"] {
+    background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+    border-color: #FDE68A;
+    color: #92400E;
+}
+
+.category-btn[data-category="housewares"]:hover {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
 }
 
 .keep-btn {
@@ -1226,6 +1335,133 @@ footer {
     background: linear-gradient(90deg, #48BB78 0%, #38A169 100%);
     transition: width 0.3s ease;
     border-radius: 6px;
+}
+
+/* Category Sorting Areas */
+.category-areas {
+    margin-top: 2rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 3px solid #E2E8F0;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+}
+
+.category-areas h4 {
+    color: #4A5568;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.category-area {
+    background: rgba(247, 250, 252, 0.8);
+    border: 2px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 1rem;
+    min-height: 120px;
+    transition: all 0.25s ease;
+}
+
+.category-area[data-category="media"] {
+    background: rgba(253, 242, 248, 0.8);
+    border-color: #F9A8D4;
+}
+
+.category-area[data-category="electronics"] {
+    background: rgba(240, 249, 255, 0.8);
+    border-color: #7DD3FC;
+}
+
+.category-area[data-category="clothing"] {
+    background: rgba(240, 253, 244, 0.8);
+    border-color: #86EFAC;
+}
+
+.category-area[data-category="housewares"] {
+    background: rgba(255, 251, 235, 0.8);
+    border-color: #FDE68A;
+}
+
+.category-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.category-icon {
+    font-size: 1.2rem;
+}
+
+.category-name {
+    flex: 1;
+    font-weight: 600;
+    color: #374151;
+}
+
+.category-count {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #D1D5DB;
+    border-radius: 12px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+    min-width: 24px;
+    text-align: center;
+}
+
+.category-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    min-height: 60px;
+}
+
+.sorted-item {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.sorted-item:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sorted-item .item-emoji {
+    font-size: 1rem;
+}
+
+.sorted-item .item-name {
+    font-weight: 500;
+    color: #374151;
+}
+
+.stock-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #E5E7EB;
 }
 
 /* Sourcing Options */
@@ -1387,9 +1623,8 @@ footer {
         gap: 1.5rem;
     }
     
-    .sorting-decisions {
-        flex-direction: row;
-        justify-content: center;
+    .category-grid {
+        grid-template-columns: 1fr;
     }
 }
 

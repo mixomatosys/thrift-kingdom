@@ -16,6 +16,16 @@ let gameState = {
     stockItems: [],         // Appraised items in warehouse
     displayItems: [],       // Items in window display
     
+    // New donation system
+    donationContainers: [], // Available containers to sort
+    currentContainer: null, // Container being sorted
+    sortedItems: {          // Items sorted into categories
+        media: [],
+        electronics: [],
+        clothing: [],
+        housewares: []
+    },
+    
     storageCapacity: 50,
     
     // Game Settings  
@@ -82,6 +92,7 @@ function initializeGame() {
     
     // Setup event listeners
     setupEventListeners();
+    setupDonationEventListeners();
     
     // Initial UI update
     updateUI();
@@ -744,6 +755,247 @@ function resetGame() {
     location.reload();
 }
 
+// Donation System Functions
+
+function setupDonationEventListeners() {
+    // Open Donations button
+    const openDonationsBtn = document.getElementById('open-donations');
+    if (openDonationsBtn) {
+        openDonationsBtn.addEventListener('click', openDonationFlow);
+    }
+    
+    // Category sorting buttons
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const category = e.currentTarget.dataset.category;
+            if (gameState.currentSortingItem) {
+                sortItemToCategory(gameState.currentSortingItem, category);
+            }
+        });
+    });
+    
+    // Toss item button
+    const tossBtn = document.getElementById('toss-item');
+    if (tossBtn) {
+        tossBtn.addEventListener('click', () => {
+            if (gameState.currentSortingItem) {
+                tossCurrentItem();
+            }
+        });
+    }
+    
+    // Move to stock button
+    const moveToStockBtn = document.getElementById('move-to-stock');
+    if (moveToStockBtn) {
+        moveToStockBtn.addEventListener('click', moveAllToStock);
+    }
+    
+    // Clear categories button
+    const clearBtn = document.getElementById('clear-categories');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', clearAllCategories);
+    }
+}
+
+function openDonationFlow() {
+    // Generate donation containers
+    generateDonationContainers();
+    
+    // Update status
+    const statusElement = document.getElementById('donation-status');
+    if (statusElement) {
+        statusElement.textContent = 'Donation containers arriving! Click one to start sorting.';
+    }
+    
+    updateUI();
+    showNotification('📦 Donation containers are arriving!');
+}
+
+function generateDonationContainers() {
+    const containerTypes = [
+        {
+            icon: '📦',
+            title: 'Garage Sale Box',
+            description: 'Mixed items from suburban garage sale',
+            itemCount: Math.floor(Math.random() * 4) + 3, // 3-6 items
+            quality: 'low'
+        },
+        {
+            icon: '🏠',
+            title: 'Estate Sale Collection',
+            description: 'Quality items from estate liquidation',
+            itemCount: Math.floor(Math.random() * 6) + 6, // 6-11 items
+            quality: 'high'
+        },
+        {
+            icon: '🎁',
+            title: 'Individual Donation',
+            description: 'Personal donation from local resident',
+            itemCount: Math.floor(Math.random() * 3) + 2, // 2-4 items
+            quality: 'medium'
+        }
+    ];
+    
+    // Generate 1-3 containers
+    const numContainers = Math.floor(Math.random() * 3) + 1;
+    for (let i = 0; i < numContainers; i++) {
+        const template = containerTypes[Math.floor(Math.random() * containerTypes.length)];
+        const container = {
+            id: Date.now() + i,
+            ...template,
+            items: generateContainerItems(template.itemCount, template.quality)
+        };
+        gameState.donationContainers.push(container);
+    }
+    
+    saveGameState();
+}
+
+function generateContainerItems(count, quality) {
+    const items = [];
+    for (let i = 0; i < count; i++) {
+        const item = generateRandomItem();
+        // Adjust item quality based on container type
+        if (quality === 'high') {
+            item.condition = Math.random() < 0.6 ? 'excellent' : item.condition;
+            item.rarity = Math.random() < 0.4 ? 'uncommon' : item.rarity;
+        } else if (quality === 'low') {
+            item.condition = Math.random() < 0.5 ? 'rough' : item.condition;
+        }
+        items.push(item);
+    }
+    return items;
+}
+
+function openDonationContainer(container) {
+    gameState.currentContainer = container;
+    gameState.currentSortingItems = [...container.items];
+    gameState.currentSortingIndex = 0;
+    
+    // Show sorting interface
+    const sortingContent = document.querySelector('.sorting-content');
+    if (sortingContent) {
+        sortingContent.style.display = 'block';
+    }
+    
+    // Update container info
+    const titleEl = document.getElementById('current-container-title');
+    const descEl = document.getElementById('current-container-desc');
+    if (titleEl) titleEl.textContent = `${container.icon} ${container.title}`;
+    if (descEl) descEl.textContent = container.description;
+    
+    // Start sorting
+    showNextSortingItem();
+    
+    // Remove container from available list
+    gameState.donationContainers = gameState.donationContainers.filter(c => c.id !== container.id);
+    
+    updateUI();
+    showNotification(`📦 Opened ${container.title} - ${container.itemCount} items to sort!`);
+}
+
+function showNextSortingItem() {
+    if (!gameState.currentSortingItems || gameState.currentSortingIndex >= gameState.currentSortingItems.length) {
+        finishSorting();
+        return;
+    }
+    
+    const item = gameState.currentSortingItems[gameState.currentSortingIndex];
+    gameState.currentSortingItem = item;
+    
+    // Update item display
+    const itemDisplay = document.getElementById('current-item');
+    if (itemDisplay) {
+        itemDisplay.innerHTML = `
+            <span class="item-emoji">${item.emoji}</span>
+            <div class="item-name">${item.name}</div>
+            <div class="item-value">$${getItemValue(item)}</div>
+            <div class="item-details">${item.rarity} • ${item.condition}</div>
+        `;
+    }
+    
+    // Update progress
+    updateSortingProgress();
+}
+
+function updateSortingProgress() {
+    const progressFill = document.getElementById('sorting-progress-fill');
+    const progressText = document.getElementById('sorting-progress-text');
+    
+    if (gameState.currentSortingItems) {
+        const progress = ((gameState.currentSortingIndex + 1) / gameState.currentSortingItems.length) * 100;
+        if (progressFill) progressFill.style.width = `${progress}%`;
+        if (progressText) progressText.textContent = `Item ${gameState.currentSortingIndex + 1} of ${gameState.currentSortingItems.length}`;
+    }
+}
+
+function sortItemToCategory(item, category) {
+    gameState.sortedItems[category].push(item);
+    gameState.currentSortingIndex++;
+    showNextSortingItem();
+    updateUI();
+    showNotification(`✅ Sorted ${item.name} to ${category}`);
+}
+
+function tossCurrentItem() {
+    gameState.currentSortingIndex++;
+    showNextSortingItem();
+    showNotification('🗑️ Item discarded');
+}
+
+function finishSorting() {
+    gameState.currentContainer = null;
+    gameState.currentSortingItems = null;
+    gameState.currentSortingIndex = 0;
+    gameState.currentSortingItem = null;
+    
+    // Hide sorting interface
+    const sortingContent = document.querySelector('.sorting-content');
+    if (sortingContent) {
+        sortingContent.style.display = 'none';
+    }
+    
+    // Reset item display
+    const itemDisplay = document.getElementById('current-item');
+    if (itemDisplay) {
+        itemDisplay.innerHTML = `
+            <div class="placeholder-content">
+                <span class="placeholder-icon">📦</span>
+                <div class="placeholder-text">Open a donation container to start sorting</div>
+            </div>
+        `;
+    }
+    
+    updateUI();
+    showNotification('✅ Finished sorting! Items are organized by category.');
+}
+
+function moveAllToStock() {
+    let totalMoved = 0;
+    Object.values(gameState.sortedItems).forEach(categoryItems => {
+        totalMoved += categoryItems.length;
+        gameState.stockItems.push(...categoryItems);
+    });
+    
+    // Clear sorted items
+    clearAllCategories();
+    
+    updateUI();
+    showNotification(`📦 Moved ${totalMoved} items to stock!`);
+    saveGameState();
+}
+
+function clearAllCategories() {
+    gameState.sortedItems = {
+        media: [],
+        electronics: [],
+        clothing: [],
+        housewares: []
+    };
+    updateUI();
+    saveGameState();
+}
+
 // Export functions for use in other modules
 window.gameState = gameState;
 window.CONFIG = CONFIG;
@@ -754,3 +1006,5 @@ window.moveToAppraisal = moveToAppraisal;
 window.moveToStock = moveToStock;
 window.moveToDisplay = moveToDisplay;
 window.sellDirectly = sellDirectly;
+window.openDonationContainer = openDonationContainer;
+window.openDonationFlow = openDonationFlow;

@@ -6,6 +6,23 @@
 function updateUI() {
     updateStats();
     updateSectionContent(gameState.currentSection);
+    updateDonationDisplay();
+    updateCategoryAreas();
+}
+
+// New Donation System Functions
+
+function updateDonationDisplay() {
+    const container = document.getElementById('donation-containers');
+    if (!container) return;
+    
+    if (gameState.donationContainers && gameState.donationContainers.length > 0) {
+        container.innerHTML = '';
+        gameState.donationContainers.forEach(donationContainer => {
+            const containerElement = createDonationContainer(donationContainer);
+            container.appendChild(containerElement);
+        });
+    }
 }
 
 function updateStats() {
@@ -367,6 +384,46 @@ function addCustomAnimations() {
     `;
     
     document.head.appendChild(style);
+}
+
+function createDonationContainer(container) {
+    const containerElement = document.createElement('div');
+    containerElement.className = 'donation-container';
+    containerElement.dataset.containerId = container.id;
+    
+    containerElement.innerHTML = `
+        <span class="container-icon">${container.icon}</span>
+        <div class="container-title">${container.title}</div>
+        <div class="container-desc">${container.description}</div>
+        <div class="container-items">${container.itemCount} items</div>
+    `;
+    
+    containerElement.addEventListener('click', () => openDonationContainer(container));
+    
+    return containerElement;
+}
+
+function updateCategoryAreas() {
+    ['media', 'electronics', 'clothing', 'housewares'].forEach(category => {
+        const countElement = document.getElementById(`${category}-count`);
+        const itemsElement = document.getElementById(`${category}-items`);
+        
+        if (countElement && itemsElement && gameState.sortedItems) {
+            const categoryItems = gameState.sortedItems[category] || [];
+            countElement.textContent = categoryItems.length;
+            
+            itemsElement.innerHTML = '';
+            categoryItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'sorted-item';
+                itemElement.innerHTML = `
+                    <span class="item-emoji">${item.emoji}</span>
+                    <span class="item-name">${item.name}</span>
+                `;
+                itemsElement.appendChild(itemElement);
+            });
+        }
+    });
 }
 
 // Initialize UI enhancements
