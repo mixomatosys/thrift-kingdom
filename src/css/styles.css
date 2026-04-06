@@ -1012,6 +1012,401 @@ footer {
     }
 }
 
+/* New Donation Sorting Styles */
+.incoming-donations {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 248, 255, 0.95) 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 3px solid #DBEAFE;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+}
+
+.containers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.donation-container {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    border: 3px solid #F59E0B;
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.donation-container:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    border-color: #D97706;
+}
+
+.container-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.container-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #92400E;
+}
+
+.container-desc {
+    font-size: 0.9rem;
+    color: #78350F;
+    margin-bottom: 1rem;
+}
+
+.container-items {
+    background: rgba(255, 255, 255, 0.7);
+    padding: 0.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #92400E;
+}
+
+/* Sorting Workspace */
+.sorting-workspace {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 3px solid #E2E8F0;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+}
+
+.workspace-header h3 {
+    color: #4A5568;
+    margin-bottom: 0.5rem;
+}
+
+.workspace-header p {
+    color: #718096;
+    font-style: italic;
+}
+
+.sorting-content {
+    margin-top: 2rem;
+}
+
+.container-info {
+    background: rgba(59, 130, 246, 0.1);
+    border: 2px solid #93C5FD;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.container-info h4 {
+    color: #1E40AF;
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+}
+
+.container-info p {
+    color: #3730A3;
+    margin: 0;
+}
+
+.sorting-interface {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+    align-items: start;
+}
+
+.item-preview-large {
+    background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+    border: 3px solid #CBD5E0;
+    border-radius: 16px;
+    padding: 3rem;
+    text-align: center;
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.item-preview-large .item-emoji {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.item-preview-large .item-name {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #2D3748;
+    margin-bottom: 0.5rem;
+}
+
+.item-preview-large .item-value {
+    font-size: 1.2rem;
+    color: #22543D;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.item-preview-large .item-details {
+    font-size: 0.9rem;
+    color: #718096;
+    text-align: center;
+}
+
+.sorting-decisions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.keep-btn {
+    background: linear-gradient(135deg, #C6F6D5 0%, #9AE6B4 100%);
+    border-color: #68D391;
+    color: #22543D;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 1rem 1.5rem;
+}
+
+.keep-btn:hover {
+    background: linear-gradient(135deg, #9AE6B4 0%, #68D391 100%);
+}
+
+.toss-btn {
+    background: linear-gradient(135deg, #FED7D7 0%, #FBB6CE 100%);
+    border-color: #F56565;
+    color: #742A2A;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 1rem 1.5rem;
+}
+
+.toss-btn:hover {
+    background: linear-gradient(135deg, #FBB6CE 0%, #F56565 100%);
+}
+
+.maybe-btn {
+    background: linear-gradient(135deg, #FEFCBF 0%, #F6E05E 100%);
+    border-color: #ECC94B;
+    color: #744210;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 1rem 1.5rem;
+}
+
+.maybe-btn:hover {
+    background: linear-gradient(135deg, #F6E05E 0%, #ECC94B 100%);
+}
+
+.sorting-progress {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: #E2E8F0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #48BB78 0%, #38A169 100%);
+    transition: width 0.3s ease;
+    border-radius: 6px;
+}
+
+/* Sourcing Options */
+.sourcing-options {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 255, 240, 0.95) 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 3px solid #C6F6D5;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+}
+
+.sourcing-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.source-btn {
+    background: linear-gradient(135deg, #E6FFFA 0%, #B2F5EA 100%);
+    border-color: #4FD1C7;
+    padding: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.source-btn:hover {
+    background: linear-gradient(135deg, #B2F5EA 0%, #81E6D9 100%);
+    transform: translateY(-3px);
+}
+
+.source-btn small {
+    display: block;
+    font-size: 0.8rem;
+    color: #234E52;
+    margin-top: 0.5rem;
+}
+
+/* Staff Section Styles */
+.staff-overview {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 250, 240, 0.95) 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 3px solid #FED7D7;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+}
+
+.staff-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.current-staff, .hire-staff {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 3px solid #E2E8F0;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+}
+
+.staff-grid, .candidate-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.empty-staff {
+    text-align: center;
+    color: #718096;
+    font-style: italic;
+    padding: 2rem;
+    background: rgba(247, 250, 252, 0.8);
+    border: 2px dashed #CBD5E0;
+    border-radius: 12px;
+}
+
+.staff-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(251, 251, 255, 0.95) 100%);
+    border: 3px solid #E9D8FD;
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+}
+
+.staff-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+    border-color: #D6BCFA;
+}
+
+.staff-avatar {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.staff-card h4 {
+    color: #2D5A27;
+    margin-bottom: 0.5rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.staff-specialty {
+    color: #805AD5;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+.staff-card p {
+    color: #718096;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.staff-stats-mini {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+}
+
+.staff-stats-mini span {
+    background: rgba(237, 242, 247, 0.8);
+    padding: 0.4rem 0.8rem;
+    border-radius: 12px;
+    color: #4A5568;
+    font-weight: 500;
+}
+
+.hire-btn {
+    background: linear-gradient(135deg, #FED7D7 0%, #FBB6CE 100%);
+    border-color: #F687B3;
+    color: #702459;
+    font-size: 1.1rem;
+    padding: 1rem 2rem;
+    font-weight: 700;
+}
+
+.hire-btn:hover {
+    background: linear-gradient(135deg, #FBB6CE 0%, #F687B3 100%);
+}
+
+/* Responsive Design for New Sections */
+@media (max-width: 1200px) {
+    .sorting-interface {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .sorting-decisions {
+        flex-direction: row;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .containers-grid, .sourcing-buttons {
+        grid-template-columns: 1fr;
+    }
+    
+    .staff-grid, .candidate-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .sorting-decisions {
+        flex-direction: column;
+    }
+}
+
 /* Animation Classes */
 .fade-in {
     animation: fadeIn 0.5s ease-in;

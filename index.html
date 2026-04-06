@@ -43,6 +43,14 @@
                 </div>
 
                 <div class="nav-section">
+                    <h3>👥 Staff</h3>
+                    <button class="nav-btn" data-section="staff">
+                        <span class="nav-icon">👥</span>
+                        <span class="nav-label">Manage Staff</span>
+                    </button>
+                </div>
+
+                <div class="nav-section">
                     <h3>🏪 Store Front</h3>
                     <button class="nav-btn" data-section="window-display">
                         <span class="nav-icon">🪟</span>
@@ -83,30 +91,66 @@
                 <section id="donations-section" class="content-section active">
                     <div class="section-header">
                         <h2>📦 Donations Center</h2>
-                        <p>Source items from various donation streams</p>
+                        <p>Sort through incoming donations - decide what to keep and what to toss</p>
                     </div>
                     
-                    <div class="donation-controls">
-                        <div class="source-toggle">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="auto-donations" checked>
-                                <span class="toggle-slider"></span>
-                                <span class="toggle-label">Auto-Receive Donations</span>
-                            </label>
-                            <p class="toggle-help">When enabled, items arrive automatically</p>
+                    <!-- Incoming Donation Containers -->
+                    <div class="incoming-donations">
+                        <h3>📥 Waiting to Sort</h3>
+                        <div id="donation-containers" class="containers-grid">
+                            <!-- Donation boxes/bags appear here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Active Sorting Area -->
+                    <div id="sorting-area" class="sorting-workspace">
+                        <div class="workspace-header">
+                            <h3>🔍 Sorting Workspace</h3>
+                            <p>Click a donation container above to start sorting</p>
                         </div>
                         
-                        <div class="manual-controls">
-                            <button class="btn primary" id="manual-search">🔍 Search for Items</button>
-                            <button class="btn" id="estate-sale">🏠 Check Estate Sales</button>
-                            <button class="btn" id="garage-sale">🚗 Browse Garage Sales</button>
+                        <div class="sorting-content" style="display: none;">
+                            <div class="container-info">
+                                <h4 id="current-container-title">📦 Estate Sale Box</h4>
+                                <p id="current-container-desc">From the Johnson Estate - mixed household items</p>
+                            </div>
+                            
+                            <div class="sorting-interface">
+                                <div class="current-item-display">
+                                    <div id="current-item" class="item-preview-large">
+                                        <!-- Current item being examined -->
+                                    </div>
+                                </div>
+                                
+                                <div class="sorting-decisions">
+                                    <button class="btn keep-btn" id="keep-item">✅ Keep Item</button>
+                                    <button class="btn toss-btn" id="toss-item">🗑️ Toss Item</button>
+                                    <button class="btn maybe-btn" id="set-aside">❓ Set Aside</button>
+                                </div>
+                                
+                                <div class="sorting-progress">
+                                    <div class="progress-bar">
+                                        <div id="sorting-progress-fill" class="progress-fill"></div>
+                                    </div>
+                                    <span id="sorting-progress-text">Item 1 of 8</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="donation-queue">
-                        <h3>📥 Recent Donations</h3>
-                        <div id="donation-items" class="donation-grid">
-                            <!-- Donation items appear here -->
+                    <!-- Manual Sourcing Options -->
+                    <div class="sourcing-options">
+                        <h3>🚗 Find More Donations</h3>
+                        <div class="sourcing-buttons">
+                            <button class="btn source-btn" id="garage-sale" data-cost="5" data-items="3-5">
+                                🚗 Garage Sale - $5 <br><small>3-5 items</small>
+                            </button>
+                            <button class="btn source-btn" id="estate-sale" data-cost="25" data-items="8-12">
+                                🏠 Estate Sale - $25 <br><small>8-12 items</small>
+                            </button>
+                            <button class="btn source-btn" id="thrift-pickup" data-cost="10" data-items="5-7">
+                                📦 Thrift Pickup - $10 <br><small>5-7 items</small>
+                            </button>
                         </div>
                     </div>
                 </section>
@@ -227,6 +271,84 @@
                             <p>Faster and more accurate appraisals</p>
                             <div class="upgrade-cost">$<span>200</span></div>
                             <button class="btn">Upgrade</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Staff Section -->
+                <section id="staff-section" class="content-section">
+                    <div class="section-header">
+                        <h2>👥 Staff Management</h2>
+                        <p>Hire and manage employees to automate your thrift shop</p>
+                    </div>
+                    
+                    <div class="staff-overview">
+                        <div class="staff-stats">
+                            <div class="stat-card">
+                                <span class="stat-number" id="staff-count">0</span>
+                                <span class="stat-label">Active Staff</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number" id="staff-wage-cost">$0</span>
+                                <span class="stat-label">Hourly Wages</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number" id="automation-level">0%</span>
+                                <span class="stat-label">Automation</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="current-staff">
+                        <h3>👥 Current Employees</h3>
+                        <div id="staff-list" class="staff-grid">
+                            <div class="empty-staff">
+                                <p>No staff hired yet. Hire your first employee below!</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="hire-staff">
+                        <h3>🎯 Available to Hire</h3>
+                        <div class="candidate-grid">
+                            <div class="staff-card" data-staff="sarah">
+                                <div class="staff-avatar">👩‍💼</div>
+                                <h4>Sarah Chen</h4>
+                                <div class="staff-specialty">Electronics Specialist</div>
+                                <p>Great at identifying vintage electronics and gaming items. Will automatically sort donation boxes, keeping 80% of electronics finds.</p>
+                                <div class="staff-stats-mini">
+                                    <span>⚡ Speed: Fast</span>
+                                    <span>🎯 Electronics: Expert</span>
+                                    <span>💰 Wage: $8/hr</span>
+                                </div>
+                                <button class="btn hire-btn" data-cost="50">Hire for $50</button>
+                            </div>
+                            
+                            <div class="staff-card" data-staff="bob">
+                                <div class="staff-avatar">👨‍🎨</div>
+                                <h4>Bob Martinez</h4>
+                                <div class="staff-specialty">Vintage Clothing Expert</div>
+                                <p>Knows vintage fashion inside and out. Will identify valuable clothing items and set up appealing displays.</p>
+                                <div class="staff-stats-mini">
+                                    <span>⚡ Speed: Medium</span>
+                                    <span>👕 Clothing: Expert</span>
+                                    <span>💰 Wage: $6/hr</span>
+                                </div>
+                                <button class="btn hire-btn" data-cost="40">Hire for $40</button>
+                            </div>
+                            
+                            <div class="staff-card" data-staff="jenny">
+                                <div class="staff-avatar">🎵</div>
+                                <h4>Jenny Rodriguez</h4>
+                                <div class="staff-specialty">Music & Media</div>
+                                <p>Vinyl record collector with deep knowledge of music history. Perfect for handling record collections and audio equipment.</p>
+                                <div class="staff-stats-mini">
+                                    <span>⚡ Speed: Medium</span>
+                                    <span>💿 Music: Expert</span>
+                                    <span>💰 Wage: $7/hr</span>
+                                </div>
+                                <button class="btn hire-btn" data-cost="45">Hire for $45</button>
+                            </div>
                         </div>
                     </div>
                 </section>
