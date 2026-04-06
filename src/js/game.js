@@ -94,11 +94,10 @@ function initializeGame() {
     // Start game loops
     startItemGeneration();
     startUIUpdate();
-    startDonationTimer();
     
     // Setup event listeners
     setupEventListeners();
-    setupDonationEventListeners();
+    setupSimpleDonationListeners();
     
     // Initial UI update
     updateUI();
@@ -763,28 +762,15 @@ function resetGame() {
 
 // Donation System Functions
 
-function setupDonationEventListeners() {
-    console.log('Setting up donation event listeners...');
-    
-    // Toggle Donations button
-    const toggleDonationsBtn = document.getElementById('toggle-donations');
-    if (toggleDonationsBtn) {
-        console.log('Found toggle button, adding listener');
-        toggleDonationsBtn.addEventListener('click', () => {
-            console.log('Toggle button clicked!');
-            toggleDonationFlow();
-        });
-    } else {
-        console.error('Toggle donations button not found!');
-    }
+function setupSimpleDonationListeners() {
+    console.log('Setting up simplified donation event listeners...');
     
     // Category sorting buttons
     document.querySelectorAll('.category-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const category = e.currentTarget.dataset.category;
-            if (gameState.currentSortingItem) {
-                sortItemToCategory(gameState.currentSortingItem, category);
-            }
+            console.log('Category button clicked:', category);
+            window.sortItemToCategory(category);
         });
     });
     
@@ -792,126 +778,190 @@ function setupDonationEventListeners() {
     const tossBtn = document.getElementById('toss-item');
     if (tossBtn) {
         tossBtn.addEventListener('click', () => {
-            if (gameState.currentSortingItem) {
-                tossCurrentItem();
-            }
+            console.log('Toss button clicked');
+            window.tossCurrentItem();
         });
     }
     
     // Move to stock button
     const moveToStockBtn = document.getElementById('move-to-stock');
     if (moveToStockBtn) {
-        moveToStockBtn.addEventListener('click', moveAllToStock);
+        moveToStockBtn.addEventListener('click', () => {
+            console.log('Move to stock clicked');
+            window.moveAllToStock();
+        });
     }
     
-    // Clear categories button
-    const clearBtn = document.getElementById('clear-categories');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', clearAllCategories);
-    }
+    console.log('✅ Event listeners set up successfully');
 }
 
-function toggleDonationFlow() {
-    if (gameState.donationsOpen) {
-        closeDonationFlow();
-    } else {
-        openDonationFlow();
-    }
-}
+// These complex functions removed - using simplified approach above
 
-function openDonationFlow() {
-    console.log('Opening donation flow...');
+// Simplified donation system that actually works
+function openDonations() {
+    console.log('=== OPENING DONATIONS ===');
     
-    gameState.donationsOpen = true;
-    gameState.nextDonationTime = Date.now() + gameState.donationInterval;
+    // Clear existing containers
+    gameState.donationContainers = [];
     
-    // Update button and UI
-    updateDonationToggleUI();
-    
-    // Generate first container immediately
-    generateDonationContainers();
-    console.log('Generated containers:', gameState.donationContainers);
-    
-    updateUI();
-    showNotification('📥 Donations are now flowing! Containers will arrive every 45 seconds.');
-}
-
-function closeDonationFlow() {
-    console.log('Closing donation flow...');
-    
-    gameState.donationsOpen = false;
-    gameState.nextDonationTime = 0;
-    
-    // Update button and UI
-    updateDonationToggleUI();
-    
-    updateUI();
-    showNotification('📦 Donation flow stopped.');
-}
-
-function generateDonationContainers() {
-    console.log('Generating donation containers...');
-    
-    const containerTypes = [
-        {
-            icon: '📦',
-            title: 'Garage Sale Box',
-            description: 'Mixed items from suburban garage sale',
-            itemCount: Math.floor(Math.random() * 4) + 3, // 3-6 items
-            quality: 'low'
-        },
+    // Early level donation sources (common items only)
+    const earlyDonationSources = [
         {
             icon: '🏠',
-            title: 'Estate Sale Collection',
-            description: 'Quality items from estate liquidation',
-            itemCount: Math.floor(Math.random() * 6) + 6, // 6-11 items
-            quality: 'high'
+            title: 'Garage Sale Box',
+            description: 'Mixed household items from weekend garage sale',
+            itemCount: Math.floor(Math.random() * 3) + 3, // 3-5 items
+        },
+        {
+            icon: '📦',
+            title: 'Attic Cleanout',
+            description: 'Old items cleared from family attic',
+            itemCount: Math.floor(Math.random() * 4) + 2, // 2-5 items
         },
         {
             icon: '🎁',
-            title: 'Individual Donation',
-            description: 'Personal donation from local resident',
-            itemCount: Math.floor(Math.random() * 3) + 2, // 2-4 items
-            quality: 'medium'
+            title: 'Moving Sale Donation',
+            description: 'Items from someone moving apartments',
+            itemCount: Math.floor(Math.random() * 3) + 4, // 4-6 items
+        },
+        {
+            icon: '📚',
+            title: 'Spring Cleaning Box',
+            description: 'Household decluttering donation',
+            itemCount: Math.floor(Math.random() * 2) + 3, // 3-4 items
         }
     ];
     
-    // Generate 1-3 containers
-    const numContainers = Math.floor(Math.random() * 3) + 1;
-    console.log(`Generating ${numContainers} containers`);
+    // Generate 1-2 containers (keep it manageable)
+    const numContainers = Math.floor(Math.random() * 2) + 1;
+    console.log(`Generating ${numContainers} donation containers...`);
     
     for (let i = 0; i < numContainers; i++) {
-        const template = containerTypes[Math.floor(Math.random() * containerTypes.length)];
+        const source = earlyDonationSources[Math.floor(Math.random() * earlyDonationSources.length)];
         const container = {
             id: Date.now() + i,
-            ...template,
-            items: generateContainerItems(template.itemCount, template.quality)
+            icon: source.icon,
+            title: source.title,
+            description: source.description,
+            itemCount: source.itemCount,
+            items: generateCommonItems(source.itemCount)
         };
+        
         gameState.donationContainers.push(container);
-        console.log('Created container:', container.title);
+        console.log('Created container:', container.title, `(${container.itemCount} items)`);
     }
     
-    console.log('Total containers now:', gameState.donationContainers.length);
+    // Update the display using working method
+    updateDonationContainers();
+    
+    const statusEl = document.getElementById('donation-status');
+    if (statusEl) statusEl.textContent = `📦 ${numContainers} donation container${numContainers > 1 ? 's' : ''} arrived! Click to sort.`;
+    
+    showNotification(`📥 ${numContainers} new donation container${numContainers > 1 ? 's' : ''} arrived!`);
     saveGameState();
 }
 
-function generateContainerItems(count, quality) {
+function generateCommonItems(count) {
+    const commonItemTypes = [
+        // Clothing (common, low value)
+        { emoji: '👕', names: ['T-Shirt', 'Polo Shirt', 'Sweater', 'Blouse'], category: 'clothing', baseValue: [2, 8] },
+        { emoji: '👖', names: ['Jeans', 'Pants', 'Shorts', 'Skirt'], category: 'clothing', baseValue: [3, 12] },
+        { emoji: '👟', names: ['Sneakers', 'Sandals', 'Boots', 'Slippers'], category: 'clothing', baseValue: [5, 15] },
+        
+        // Housewares (common, low value)
+        { emoji: '🍽️', names: ['Plate Set', 'Coffee Mug', 'Bowl', 'Silverware'], category: 'housewares', baseValue: [1, 6] },
+        { emoji: '🕯️', names: ['Candle', 'Picture Frame', 'Vase', 'Decorative Bowl'], category: 'housewares', baseValue: [2, 8] },
+        { emoji: '🧺', names: ['Basket', 'Storage Box', 'Lamp', 'Clock'], category: 'housewares', baseValue: [3, 10] },
+        
+        // Media (common, low value)
+        { emoji: '📚', names: ['Paperback Book', 'Magazine', 'Cookbook', 'Novel'], category: 'media', baseValue: [1, 4] },
+        { emoji: '💿', names: ['CD Album', 'DVD Movie', 'Audio Book', 'Game'], category: 'media', baseValue: [2, 8] },
+        
+        // Electronics (common, older items)
+        { emoji: '📻', names: ['Old Radio', 'Calculator', 'Digital Clock', 'Flashlight'], category: 'electronics', baseValue: [3, 12] },
+        { emoji: '🔌', names: ['Phone Charger', 'Extension Cord', 'Power Strip', 'Cable'], category: 'electronics', baseValue: [2, 6] }
+    ];
+    
     const items = [];
     for (let i = 0; i < count; i++) {
-        const item = generateRandomItem();
-        // Adjust item quality based on container type
-        if (quality === 'high') {
-            item.condition = Math.random() < 0.6 ? 'excellent' : item.condition;
-            item.rarity = Math.random() < 0.4 ? 'uncommon' : item.rarity;
-        } else if (quality === 'low') {
-            item.condition = Math.random() < 0.5 ? 'rough' : item.condition;
-        }
-        items.push(item);
+        const itemType = commonItemTypes[Math.floor(Math.random() * commonItemTypes.length)];
+        const name = itemType.names[Math.floor(Math.random() * itemType.names.length)];
+        const baseValue = Math.floor(Math.random() * (itemType.baseValue[1] - itemType.baseValue[0] + 1)) + itemType.baseValue[0];
+        
+        // Only common condition and rarity for early game
+        const conditions = ['rough', 'fair', 'good'];
+        const condition = conditions[Math.floor(Math.random() * conditions.length)];
+        
+        const conditionMultipliers = { rough: 0.5, fair: 0.8, good: 1.0 };
+        const finalValue = Math.max(1, Math.floor(baseValue * conditionMultipliers[condition]));
+        
+        items.push({
+            id: Date.now() + i + Math.random(),
+            name: name,
+            emoji: itemType.emoji,
+            category: itemType.category,
+            value: finalValue,
+            rarity: 'common',
+            condition: condition
+        });
     }
+    
     return items;
 }
 
-function openDonationContainer(container) {
+function updateDonationContainers() {
+    const container = document.getElementById('donation-containers');
+    if (!container) {
+        console.error('❌ Could not find donation-containers element');
+        return;
+    }
+    
+    if (gameState.donationContainers.length === 0) {
+        container.innerHTML = `
+            <div class="no-donations">
+                <p>No donation containers yet. Click "Open Donations" to start!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    console.log(`Displaying ${gameState.donationContainers.length} containers`);
+    
+    let containerHTML = '';
+    gameState.donationContainers.forEach((donationContainer) => {
+        containerHTML += `
+            <div class="donation-container" onclick="window.openContainer(${donationContainer.id})">
+                <span class="container-icon">${donationContainer.icon}</span>
+                <div class="container-title">${donationContainer.title}</div>
+                <div class="container-desc">${donationContainer.description}</div>
+                <div class="container-items">${donationContainer.itemCount} items</div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = containerHTML;
+    console.log('✅ Containers displayed successfully');
+}
+
+function openContainer(containerId) {
+    console.log('Opening container:', containerId);
+    const container = gameState.donationContainers.find(c => c.id == containerId);
+    if (!container) {
+        console.error('Container not found:', containerId);
+        return;
+    }
+    
+    // Start sorting process
+    startSorting(container);
+    
+    // Remove from available containers
+    gameState.donationContainers = gameState.donationContainers.filter(c => c.id != containerId);
+    updateDonationContainers();
+}
+
+function startSorting(container) {
+    console.log('Starting sorting for:', container.title);
+    
     gameState.currentContainer = container;
     gameState.currentSortingItems = [...container.items];
     gameState.currentSortingIndex = 0;
@@ -928,17 +978,13 @@ function openDonationContainer(container) {
     if (titleEl) titleEl.textContent = `${container.icon} ${container.title}`;
     if (descEl) descEl.textContent = container.description;
     
-    // Start sorting
-    showNextSortingItem();
+    // Show first item
+    showNextItem();
     
-    // Remove container from available list
-    gameState.donationContainers = gameState.donationContainers.filter(c => c.id !== container.id);
-    
-    updateUI();
-    showNotification(`📦 Opened ${container.title} - ${container.itemCount} items to sort!`);
+    showNotification(`📦 Started sorting ${container.title} - ${container.itemCount} items to sort!`);
 }
 
-function showNextSortingItem() {
+function showNextItem() {
     if (!gameState.currentSortingItems || gameState.currentSortingIndex >= gameState.currentSortingItems.length) {
         finishSorting();
         return;
@@ -953,41 +999,23 @@ function showNextSortingItem() {
         itemDisplay.innerHTML = `
             <span class="item-emoji">${item.emoji}</span>
             <div class="item-name">${item.name}</div>
-            <div class="item-value">$${getItemValue(item)}</div>
+            <div class="item-value">$${item.value}</div>
             <div class="item-details">${item.rarity} • ${item.condition}</div>
         `;
     }
     
     // Update progress
-    updateSortingProgress();
-}
-
-function updateSortingProgress() {
     const progressFill = document.getElementById('sorting-progress-fill');
     const progressText = document.getElementById('sorting-progress-text');
     
-    if (gameState.currentSortingItems) {
-        const progress = ((gameState.currentSortingIndex + 1) / gameState.currentSortingItems.length) * 100;
-        if (progressFill) progressFill.style.width = `${progress}%`;
-        if (progressText) progressText.textContent = `Item ${gameState.currentSortingIndex + 1} of ${gameState.currentSortingItems.length}`;
-    }
-}
-
-function sortItemToCategory(item, category) {
-    gameState.sortedItems[category].push(item);
-    gameState.currentSortingIndex++;
-    showNextSortingItem();
-    updateUI();
-    showNotification(`✅ Sorted ${item.name} to ${category}`);
-}
-
-function tossCurrentItem() {
-    gameState.currentSortingIndex++;
-    showNextSortingItem();
-    showNotification('🗑️ Item discarded');
+    const progress = ((gameState.currentSortingIndex + 1) / gameState.currentSortingItems.length) * 100;
+    if (progressFill) progressFill.style.width = `${progress}%`;
+    if (progressText) progressText.textContent = `Item ${gameState.currentSortingIndex + 1} of ${gameState.currentSortingItems.length}`;
 }
 
 function finishSorting() {
+    console.log('Finished sorting container');
+    
     gameState.currentContainer = null;
     gameState.currentSortingItems = null;
     gameState.currentSortingIndex = 0;
@@ -1010,11 +1038,36 @@ function finishSorting() {
         `;
     }
     
-    updateUI();
-    showNotification('✅ Finished sorting! Items are organized by category.');
+    showNotification('✅ Finished sorting! Items organized by category.');
 }
 
-function moveAllToStock() {
+// Category sorting functions (simplified)
+window.sortItemToCategory = function(category) {
+    if (!gameState.currentSortingItem) return;
+    
+    console.log(`Sorting ${gameState.currentSortingItem.name} to ${category}`);
+    
+    if (!gameState.sortedItems[category]) {
+        gameState.sortedItems[category] = [];
+    }
+    
+    gameState.sortedItems[category].push(gameState.currentSortingItem);
+    gameState.currentSortingIndex++;
+    showNextItem();
+    updateCategoryDisplay();
+    showNotification(`✅ Sorted ${gameState.currentSortingItem.name} to ${category}`);
+};
+
+window.tossCurrentItem = function() {
+    if (!gameState.currentSortingItem) return;
+    
+    console.log(`Tossing ${gameState.currentSortingItem.name}`);
+    gameState.currentSortingIndex++;
+    showNextItem();
+    showNotification('🗑️ Item discarded');
+};
+
+window.moveAllToStock = function() {
     let totalMoved = 0;
     Object.values(gameState.sortedItems).forEach(categoryItems => {
         totalMoved += categoryItems.length;
@@ -1022,121 +1075,39 @@ function moveAllToStock() {
     });
     
     // Clear sorted items
-    clearAllCategories();
-    
-    updateUI();
-    showNotification(`📦 Moved ${totalMoved} items to stock!`);
-    saveGameState();
-}
-
-function clearAllCategories() {
     gameState.sortedItems = {
         media: [],
         electronics: [],
         clothing: [],
         housewares: []
     };
-    updateUI();
+    
+    updateCategoryDisplay();
+    showNotification(`📦 Moved ${totalMoved} items to stock!`);
     saveGameState();
-}
+};
 
-function updateDonationToggleUI() {
-    const button = document.getElementById('toggle-donations');
-    const timer = document.getElementById('donation-timer');
-    const status = document.getElementById('donation-status');
-    
-    if (gameState.donationsOpen) {
-        button.textContent = '📦 Close Donations';
-        button.classList.add('donations-open');
-        timer.style.display = 'block';
-        status.textContent = 'Donations flowing! Containers arrive every 45 seconds.';
-    } else {
-        button.textContent = '📥 Open Donations';
-        button.classList.remove('donations-open');
-        timer.style.display = 'none';
-        status.textContent = 'Click to start receiving donation containers';
-    }
-}
-
-function updateDonationTimer() {
-    if (!gameState.donationsOpen) return;
-    
-    const now = Date.now();
-    const timeLeft = Math.max(0, gameState.nextDonationTime - now);
-    const progress = Math.max(0, (gameState.donationInterval - timeLeft) / gameState.donationInterval * 100);
-    
-    // Update timer display
-    const timerProgress = document.getElementById('timer-progress');
-    const timerText = document.getElementById('timer-text');
-    
-    if (timerProgress) {
-        timerProgress.style.width = `${progress}%`;
-    }
-    
-    if (timerText) {
-        const seconds = Math.ceil(timeLeft / 1000);
-        timerText.textContent = `${seconds}s`;
-    }
-    
-    // Generate new container when timer expires
-    if (timeLeft <= 0 && gameState.donationsOpen) {
-        generateDonationContainers();
-        gameState.nextDonationTime = now + gameState.donationInterval;
-        showNotification('📦 New donation container arrived!');
-        updateUI();
-        saveGameState();
-    }
-}
-
-function startDonationTimer() {
-    setInterval(() => {
-        updateDonationTimer();
-    }, 100); // Update every 100ms for smooth progress bar
-}
-
-// Simple test function to bypass complex logic
-function testDonations() {
-    console.log('=== SIMPLE TEST FUNCTION ===');
-    
-    // Clear existing containers
-    gameState.donationContainers = [];
-    
-    // Create one simple test container
-    const testContainer = {
-        id: Date.now(),
-        icon: '📦',
-        title: 'Test Container',
-        description: 'Simple test container',
-        itemCount: 5,
-        items: [
-            { id: 1, name: 'Test Item 1', emoji: '📺', value: 10, rarity: 'common', condition: 'good' },
-            { id: 2, name: 'Test Item 2', emoji: '👕', value: 15, rarity: 'common', condition: 'excellent' }
-        ]
-    };
-    
-    gameState.donationContainers.push(testContainer);
-    console.log('Created test container:', testContainer);
-    
-    // Try to update display
-    const container = document.getElementById('donation-containers');
-    if (container) {
-        console.log('Found container element, updating...');
-        container.innerHTML = `
-            <div class="donation-container" onclick="alert('Container clicked!')">
-                <span class="container-icon">📦</span>
-                <div class="container-title">Test Container</div>
-                <div class="container-desc">Simple test container</div>
-                <div class="container-items">5 items</div>
-            </div>
-        `;
-        console.log('✅ Display updated successfully!');
+function updateCategoryDisplay() {
+    ['media', 'electronics', 'clothing', 'housewares'].forEach(category => {
+        const countElement = document.getElementById(`${category}-count`);
+        const itemsElement = document.getElementById(`${category}-items`);
         
-        const statusEl = document.getElementById('donation-status');
-        if (statusEl) statusEl.textContent = '✅ Test container generated!';
-        
-    } else {
-        console.error('❌ Could not find donation-containers element');
-    }
+        if (countElement && itemsElement) {
+            const categoryItems = gameState.sortedItems[category] || [];
+            countElement.textContent = categoryItems.length;
+            
+            itemsElement.innerHTML = '';
+            categoryItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'sorted-item';
+                itemElement.innerHTML = `
+                    <span class="item-emoji">${item.emoji}</span>
+                    <span class="item-name">${item.name}</span>
+                `;
+                itemsElement.appendChild(itemElement);
+            });
+        }
+    });
 }
 
 // Export functions for use in other modules
@@ -1149,7 +1120,8 @@ window.moveToAppraisal = moveToAppraisal;
 window.moveToStock = moveToStock;
 window.moveToDisplay = moveToDisplay;
 window.sellDirectly = sellDirectly;
-window.openDonationContainer = openDonationContainer;
-window.toggleDonationFlow = toggleDonationFlow;
-window.updateDonationToggleUI = updateDonationToggleUI;
-window.testDonations = testDonations;
+window.openDonations = openDonations;
+window.openContainer = openContainer;
+window.sortItemToCategory = sortItemToCategory;
+window.tossCurrentItem = tossCurrentItem;
+window.moveAllToStock = moveAllToStock;

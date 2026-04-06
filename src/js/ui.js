@@ -6,9 +6,8 @@
 function updateUI() {
     updateStats();
     updateSectionContent(gameState.currentSection);
-    updateDonationDisplay();
-    updateCategoryAreas();
-    updateDonationToggleUI();
+    // Donation display now handled by updateDonationContainers()
+    // Category areas now handled by updateCategoryDisplay()
 }
 
 // Helper function - define first
