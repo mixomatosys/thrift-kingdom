@@ -798,8 +798,12 @@ function setupDonationEventListeners() {
 }
 
 function openDonationFlow() {
+    console.log('Opening donation flow...');
+    
     // Generate donation containers
     generateDonationContainers();
+    
+    console.log('Generated containers:', gameState.donationContainers);
     
     // Update status
     const statusElement = document.getElementById('donation-status');

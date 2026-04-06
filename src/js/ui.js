@@ -14,7 +14,12 @@ function updateUI() {
 
 function updateDonationDisplay() {
     const container = document.getElementById('donation-containers');
-    if (!container) return;
+    if (!container) {
+        console.log('ERROR: donation-containers element not found');
+        return;
+    }
+    
+    console.log('Updating donation display, containers:', gameState.donationContainers);
     
     if (gameState.donationContainers && gameState.donationContainers.length > 0) {
         container.innerHTML = '';
