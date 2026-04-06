@@ -26,6 +26,11 @@ let gameState = {
         housewares: []
     },
     
+    // Donation flow management
+    donationsOpen: false,      // Whether donations are flowing
+    nextDonationTime: 0,       // When next donation arrives
+    donationInterval: 45000,   // 45 seconds between donations
+    
     storageCapacity: 50,
     
     // Game Settings  
@@ -89,6 +94,7 @@ function initializeGame() {
     // Start game loops
     startItemGeneration();
     startUIUpdate();
+    startDonationTimer();
     
     // Setup event listeners
     setupEventListeners();
@@ -758,10 +764,10 @@ function resetGame() {
 // Donation System Functions
 
 function setupDonationEventListeners() {
-    // Open Donations button
-    const openDonationsBtn = document.getElementById('open-donations');
-    if (openDonationsBtn) {
-        openDonationsBtn.addEventListener('click', openDonationFlow);
+    // Toggle Donations button
+    const toggleDonationsBtn = document.getElementById('toggle-donations');
+    if (toggleDonationsBtn) {
+        toggleDonationsBtn.addEventListener('click', toggleDonationFlow);
     }
     
     // Category sorting buttons
@@ -797,22 +803,42 @@ function setupDonationEventListeners() {
     }
 }
 
+function toggleDonationFlow() {
+    if (gameState.donationsOpen) {
+        closeDonationFlow();
+    } else {
+        openDonationFlow();
+    }
+}
+
 function openDonationFlow() {
     console.log('Opening donation flow...');
     
-    // Generate donation containers
-    generateDonationContainers();
+    gameState.donationsOpen = true;
+    gameState.nextDonationTime = Date.now() + gameState.donationInterval;
     
+    // Update button and UI
+    updateDonationToggleUI();
+    
+    // Generate first container immediately
+    generateDonationContainers();
     console.log('Generated containers:', gameState.donationContainers);
     
-    // Update status
-    const statusElement = document.getElementById('donation-status');
-    if (statusElement) {
-        statusElement.textContent = 'Donation containers arriving! Click one to start sorting.';
-    }
+    updateUI();
+    showNotification('📥 Donations are now flowing! Containers will arrive every 45 seconds.');
+}
+
+function closeDonationFlow() {
+    console.log('Closing donation flow...');
+    
+    gameState.donationsOpen = false;
+    gameState.nextDonationTime = 0;
+    
+    // Update button and UI
+    updateDonationToggleUI();
     
     updateUI();
-    showNotification('📦 Donation containers are arriving!');
+    showNotification('📦 Donation flow stopped.');
 }
 
 function generateDonationContainers() {
@@ -1000,6 +1026,60 @@ function clearAllCategories() {
     saveGameState();
 }
 
+function updateDonationToggleUI() {
+    const button = document.getElementById('toggle-donations');
+    const timer = document.getElementById('donation-timer');
+    const status = document.getElementById('donation-status');
+    
+    if (gameState.donationsOpen) {
+        button.textContent = '📦 Close Donations';
+        button.classList.add('donations-open');
+        timer.style.display = 'block';
+        status.textContent = 'Donations flowing! Containers arrive every 45 seconds.';
+    } else {
+        button.textContent = '📥 Open Donations';
+        button.classList.remove('donations-open');
+        timer.style.display = 'none';
+        status.textContent = 'Click to start receiving donation containers';
+    }
+}
+
+function updateDonationTimer() {
+    if (!gameState.donationsOpen) return;
+    
+    const now = Date.now();
+    const timeLeft = Math.max(0, gameState.nextDonationTime - now);
+    const progress = Math.max(0, (gameState.donationInterval - timeLeft) / gameState.donationInterval * 100);
+    
+    // Update timer display
+    const timerProgress = document.getElementById('timer-progress');
+    const timerText = document.getElementById('timer-text');
+    
+    if (timerProgress) {
+        timerProgress.style.width = `${progress}%`;
+    }
+    
+    if (timerText) {
+        const seconds = Math.ceil(timeLeft / 1000);
+        timerText.textContent = `${seconds}s`;
+    }
+    
+    // Generate new container when timer expires
+    if (timeLeft <= 0 && gameState.donationsOpen) {
+        generateDonationContainers();
+        gameState.nextDonationTime = now + gameState.donationInterval;
+        showNotification('📦 New donation container arrived!');
+        updateUI();
+        saveGameState();
+    }
+}
+
+function startDonationTimer() {
+    setInterval(() => {
+        updateDonationTimer();
+    }, 100); // Update every 100ms for smooth progress bar
+}
+
 // Export functions for use in other modules
 window.gameState = gameState;
 window.CONFIG = CONFIG;
@@ -1011,4 +1091,5 @@ window.moveToStock = moveToStock;
 window.moveToDisplay = moveToDisplay;
 window.sellDirectly = sellDirectly;
 window.openDonationContainer = openDonationContainer;
-window.openDonationFlow = openDonationFlow;
+window.toggleDonationFlow = toggleDonationFlow;
+window.updateDonationToggleUI = updateDonationToggleUI;

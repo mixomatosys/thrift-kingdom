@@ -8,6 +8,25 @@ function updateUI() {
     updateSectionContent(gameState.currentSection);
     updateDonationDisplay();
     updateCategoryAreas();
+    updateDonationToggleUI();
+}
+
+// Helper function - define first
+function createDonationContainer(container) {
+    const containerElement = document.createElement('div');
+    containerElement.className = 'donation-container';
+    containerElement.dataset.containerId = container.id;
+    
+    containerElement.innerHTML = `
+        <span class="container-icon">${container.icon}</span>
+        <div class="container-title">${container.title}</div>
+        <div class="container-desc">${container.description}</div>
+        <div class="container-items">${container.itemCount} items</div>
+    `;
+    
+    containerElement.addEventListener('click', () => openDonationContainer(container));
+    
+    return containerElement;
 }
 
 // New Donation System Functions
@@ -27,6 +46,13 @@ function updateDonationDisplay() {
             const containerElement = createDonationContainer(donationContainer);
             container.appendChild(containerElement);
         });
+    } else {
+        // Show placeholder when no containers
+        container.innerHTML = `
+            <div class="no-donations">
+                <p>No donation containers yet. Click "Open Donations" to start!</p>
+            </div>
+        `;
     }
 }
 
@@ -389,23 +415,6 @@ function addCustomAnimations() {
     `;
     
     document.head.appendChild(style);
-}
-
-function createDonationContainer(container) {
-    const containerElement = document.createElement('div');
-    containerElement.className = 'donation-container';
-    containerElement.dataset.containerId = container.id;
-    
-    containerElement.innerHTML = `
-        <span class="container-icon">${container.icon}</span>
-        <div class="container-title">${container.title}</div>
-        <div class="container-desc">${container.description}</div>
-        <div class="container-items">${container.itemCount} items</div>
-    `;
-    
-    containerElement.addEventListener('click', () => openDonationContainer(container));
-    
-    return containerElement;
 }
 
 function updateCategoryAreas() {

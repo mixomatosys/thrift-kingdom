@@ -1029,6 +1029,70 @@ footer {
     font-style: italic;
 }
 
+/* Donation Toggle States */
+#toggle-donations {
+    transition: all 0.3s ease;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 1rem 2rem;
+    position: relative;
+}
+
+#toggle-donations.donations-open {
+    background: linear-gradient(135deg, #C6F6D5 0%, #9AE6B4 100%);
+    border-color: #68D391;
+    color: #22543D;
+}
+
+#toggle-donations.donations-open:hover {
+    background: linear-gradient(135deg, #9AE6B4 0%, #68D391 100%);
+}
+
+#toggle-donations.donations-open::after {
+    content: ' ✅';
+}
+
+/* Donation Timer */
+.donation-timer {
+    background: rgba(99, 102, 241, 0.1);
+    border: 2px solid #C4B5FD;
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.timer-label {
+    color: #6B46C1;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.timer-bar {
+    width: 100%;
+    height: 8px;
+    background: #E2E8F0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0.5rem 0;
+    position: relative;
+}
+
+.timer-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #68D391 0%, #48BB78 100%);
+    border-radius: 4px;
+    transition: width 0.1s ease;
+    width: 0%;
+}
+
+.timer-text {
+    color: #6B46C1;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
 .no-donations {
     text-align: center;
     color: #718096;
