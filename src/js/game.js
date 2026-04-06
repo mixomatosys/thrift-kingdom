@@ -877,51 +877,130 @@ function openDonations() {
 }
 
 function generateCommonItems(count) {
-    const commonItemTypes = [
-        // Clothing (common, low value)
-        { emoji: '👕', names: ['T-Shirt', 'Polo Shirt', 'Sweater', 'Blouse'], category: 'clothing', baseValue: [2, 8] },
-        { emoji: '👖', names: ['Jeans', 'Pants', 'Shorts', 'Skirt'], category: 'clothing', baseValue: [3, 12] },
-        { emoji: '👟', names: ['Sneakers', 'Sandals', 'Boots', 'Slippers'], category: 'clothing', baseValue: [5, 15] },
+    const itemTypes = [
+        // Clothing - with brand variations for different rarities
+        { emoji: '👕', names: {
+            common: ['T-Shirt', 'Basic Polo', 'Generic Sweater'],
+            uncommon: ['Nike Shirt', 'Adidas Polo', 'Brand Name Hoodie'],
+            rare: ['Vintage Band Shirt', '1990s Champion Hoodie', 'Designer Blouse']
+        }, category: 'clothing' },
         
-        // Housewares (common, low value)
-        { emoji: '🍽️', names: ['Plate Set', 'Coffee Mug', 'Bowl', 'Silverware'], category: 'housewares', baseValue: [1, 6] },
-        { emoji: '🕯️', names: ['Candle', 'Picture Frame', 'Vase', 'Decorative Bowl'], category: 'housewares', baseValue: [2, 8] },
-        { emoji: '🧺', names: ['Basket', 'Storage Box', 'Lamp', 'Clock'], category: 'housewares', baseValue: [3, 10] },
+        { emoji: '👖', names: {
+            common: ['Jeans', 'Khaki Pants', 'Basic Shorts'],
+            uncommon: ['Levi\'s Jeans', 'Brand Name Pants', 'Designer Shorts'],
+            rare: ['Vintage Levi\'s 501', 'Designer Jeans', 'Collectible Denim']
+        }, category: 'clothing' },
         
-        // Media (common, low value)
-        { emoji: '📚', names: ['Paperback Book', 'Magazine', 'Cookbook', 'Novel'], category: 'media', baseValue: [1, 4] },
-        { emoji: '💿', names: ['CD Album', 'DVD Movie', 'Audio Book', 'Game'], category: 'media', baseValue: [2, 8] },
+        { emoji: '👟', names: {
+            common: ['Generic Sneakers', 'Basic Sandals', 'Work Boots'],
+            uncommon: ['Nike Sneakers', 'Adidas Shoes', 'Brand Boots'],
+            rare: ['Vintage Jordans', 'Limited Edition Sneakers', 'Designer Shoes']
+        }, category: 'clothing' },
         
-        // Electronics (common, older items)
-        { emoji: '📻', names: ['Old Radio', 'Calculator', 'Digital Clock', 'Flashlight'], category: 'electronics', baseValue: [3, 12] },
-        { emoji: '🔌', names: ['Phone Charger', 'Extension Cord', 'Power Strip', 'Cable'], category: 'electronics', baseValue: [2, 6] }
+        // Housewares
+        { emoji: '🍽️', names: {
+            common: ['Plate Set', 'Coffee Mug', 'Plastic Bowl'],
+            uncommon: ['Ceramic Dinnerware', 'Branded Mug', 'Glass Bowl Set'],
+            rare: ['Vintage China', 'Antique Dinnerware', 'Collector Plates']
+        }, category: 'housewares' },
+        
+        { emoji: '🕯️', names: {
+            common: ['Candle', 'Basic Frame', 'Simple Vase'],
+            uncommon: ['Scented Candle', 'Nice Frame', 'Ceramic Vase'],
+            rare: ['Antique Candlestick', 'Vintage Frame', 'Art Glass Vase']
+        }, category: 'housewares' },
+        
+        // Media
+        { emoji: '📚', names: {
+            common: ['Paperback Book', 'Magazine', 'Cookbook'],
+            uncommon: ['Hardcover Book', 'Collectible Magazine', 'Specialty Cookbook'],
+            rare: ['First Edition Book', 'Vintage Magazine', 'Rare Cookbook']
+        }, category: 'media' },
+        
+        { emoji: '💿', names: {
+            common: ['CD Album', 'DVD Movie', 'Basic Game'],
+            uncommon: ['Popular CD', 'Special Edition DVD', 'Brand Name Game'],
+            rare: ['Rare CD', 'Collector DVD', 'Vintage Video Game']
+        }, category: 'media' },
+        
+        // Electronics
+        { emoji: '📻', names: {
+            common: ['Old Radio', 'Calculator', 'Digital Clock'],
+            uncommon: ['Vintage Radio', 'Scientific Calculator', 'Alarm Clock'],
+            rare: ['Antique Radio', 'Rare Calculator', 'Vintage Electronics']
+        }, category: 'electronics' },
+        
+        { emoji: '🔌', names: {
+            common: ['Phone Charger', 'Extension Cord', 'Basic Cable'],
+            uncommon: ['Fast Charger', 'Heavy Duty Cord', 'Premium Cable'],
+            rare: ['Vintage Charger', 'Rare Cable', 'Collector Electronics']
+        }, category: 'electronics' }
+    ];
+    
+    // Rarity distribution for early game (weighted toward common)
+    const rarityDistribution = [
+        { rarity: 'common', weight: 70, baseMultiplier: [1, 8] },
+        { rarity: 'uncommon', weight: 25, baseMultiplier: [8, 25] },
+        { rarity: 'rare', weight: 5, baseMultiplier: [25, 75] }
+    ];
+    
+    // Quality conditions with multipliers
+    const qualityDistribution = [
+        { quality: 'rough', weight: 15, multiplier: 0.3, color: '🔴' },
+        { quality: 'poor', weight: 20, multiplier: 0.5, color: '🟠' },
+        { quality: 'ok', weight: 30, multiplier: 0.7, color: '🟡' },
+        { quality: 'good', weight: 25, multiplier: 1.0, color: '🟢' },
+        { quality: 'excellent', weight: 8, multiplier: 1.3, color: '🔵' },
+        { quality: 'mint', weight: 2, multiplier: 1.6, color: '🟣' }
     ];
     
     const items = [];
     for (let i = 0; i < count; i++) {
-        const itemType = commonItemTypes[Math.floor(Math.random() * commonItemTypes.length)];
-        const name = itemType.names[Math.floor(Math.random() * itemType.names.length)];
-        const baseValue = Math.floor(Math.random() * (itemType.baseValue[1] - itemType.baseValue[0] + 1)) + itemType.baseValue[0];
+        const itemType = itemTypes[Math.floor(Math.random() * itemTypes.length)];
         
-        // Only common condition and rarity for early game
-        const conditions = ['rough', 'fair', 'good'];
-        const condition = conditions[Math.floor(Math.random() * conditions.length)];
+        // Select rarity (weighted random)
+        const rarity = selectWeightedRandom(rarityDistribution);
         
-        const conditionMultipliers = { rough: 0.5, fair: 0.8, good: 1.0 };
-        const finalValue = Math.max(1, Math.floor(baseValue * conditionMultipliers[condition]));
+        // Select quality (weighted random)  
+        const quality = selectWeightedRandom(qualityDistribution);
+        
+        // Get name based on rarity
+        const namesByRarity = itemType.names[rarity.rarity] || itemType.names.common;
+        const name = namesByRarity[Math.floor(Math.random() * namesByRarity.length)];
+        
+        // Calculate base value from rarity
+        const rarityData = rarityDistribution.find(r => r.rarity === rarity.rarity);
+        const baseValue = Math.floor(Math.random() * (rarityData.baseMultiplier[1] - rarityData.baseMultiplier[0] + 1)) + rarityData.baseMultiplier[0];
         
         items.push({
             id: Date.now() + i + Math.random(),
             name: name,
             emoji: itemType.emoji,
             category: itemType.category,
-            value: finalValue,
-            rarity: 'common',
-            condition: condition
+            rarity: rarity.rarity,
+            quality: quality.quality,
+            qualityColor: quality.color,
+            qualityMultiplier: quality.multiplier,
+            baseValue: baseValue,
+            isAppraised: false // Hidden until appraised
         });
     }
     
     return items;
+}
+
+function selectWeightedRandom(options) {
+    const totalWeight = options.reduce((sum, option) => sum + option.weight, 0);
+    let random = Math.random() * totalWeight;
+    
+    for (const option of options) {
+        if (random < option.weight) {
+            return option;
+        }
+        random -= option.weight;
+    }
+    
+    return options[0]; // fallback
 }
 
 function updateDonationContainers() {
@@ -1008,14 +1087,23 @@ function showNextItem() {
     const item = gameState.currentSortingItems[gameState.currentSortingIndex];
     gameState.currentSortingItem = item;
     
-    // Update item display
+    // Update item display - NO VALUE shown until appraised
     const itemDisplay = document.getElementById('current-item');
     if (itemDisplay) {
+        const rarityColors = {
+            'common': '🟫',
+            'uncommon': '🟩', 
+            'rare': '🟦',
+            'epic': '🟪',
+            'legendary': '🟨'
+        };
+        
         itemDisplay.innerHTML = `
             <span class="item-emoji">${item.emoji}</span>
             <div class="item-name">${item.name}</div>
-            <div class="item-value">$${item.value}</div>
-            <div class="item-details">${item.rarity} • ${item.condition}</div>
+            <div class="item-rarity">${rarityColors[item.rarity]} ${item.rarity.charAt(0).toUpperCase() + item.rarity.slice(1)}</div>
+            <div class="item-quality">${item.qualityColor} ${item.quality.charAt(0).toUpperCase() + item.quality.slice(1)} condition</div>
+            <div class="item-value-hint">Value: ❓ (Requires appraisal)</div>
         `;
     }
     
@@ -1085,9 +1173,16 @@ window.tossCurrentItem = function() {
 
 window.moveAllToStock = function() {
     let totalMoved = 0;
+    let totalValue = 0;
+    
     Object.values(gameState.sortedItems).forEach(categoryItems => {
-        totalMoved += categoryItems.length;
-        gameState.stockItems.push(...categoryItems);
+        categoryItems.forEach(item => {
+            // Auto-appraise when moving to stock
+            const value = appraiseItem(item);
+            totalValue += value;
+            gameState.stockItems.push(item);
+            totalMoved++;
+        });
     });
     
     // Clear sorted items
@@ -1099,7 +1194,7 @@ window.moveAllToStock = function() {
     };
     
     updateCategoryDisplay();
-    showNotification(`📦 Moved ${totalMoved} items to stock!`);
+    showNotification(`📦 Moved ${totalMoved} items to stock! Total appraised value: $${totalValue}`);
     saveGameState();
 };
 
@@ -1114,16 +1209,39 @@ function updateCategoryDisplay() {
             
             itemsElement.innerHTML = '';
             categoryItems.forEach(item => {
+                const rarityColors = {
+                    'common': '🟫',
+                    'uncommon': '🟩', 
+                    'rare': '🟦',
+                    'epic': '🟪',
+                    'legendary': '🟨'
+                };
+                
                 const itemElement = document.createElement('div');
                 itemElement.className = 'sorted-item';
                 itemElement.innerHTML = `
                     <span class="item-emoji">${item.emoji}</span>
-                    <span class="item-name">${item.name}</span>
+                    <div class="sorted-item-info">
+                        <span class="item-name">${item.name}</span>
+                        <div class="item-details">${rarityColors[item.rarity]} ${item.rarity} • ${item.qualityColor} ${item.quality}</div>
+                    </div>
                 `;
                 itemsElement.appendChild(itemElement);
             });
         }
     });
+}
+
+function calculateItemValue(item) {
+    // Calculate final value = base value × quality multiplier
+    return Math.max(1, Math.floor(item.baseValue * item.qualityMultiplier));
+}
+
+function appraiseItem(item) {
+    // Mark as appraised and calculate final value
+    item.isAppraised = true;
+    item.finalValue = calculateItemValue(item);
+    return item.finalValue;
 }
 
 function updateDonationButton() {
