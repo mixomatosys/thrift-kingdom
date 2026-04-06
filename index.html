@@ -96,15 +96,8 @@
                     
                     <!-- Donation Controls -->
                     <div class="donation-flow-controls">
-                        <button class="btn primary" id="toggle-donations">📥 Open Donations</button>
-                        <div class="donation-timer" id="donation-timer" style="display: none;">
-                            <div class="timer-label">Next donation in:</div>
-                            <div class="timer-bar">
-                                <div class="timer-progress" id="timer-progress"></div>
-                            </div>
-                            <div class="timer-text" id="timer-text">45s</div>
-                        </div>
-                        <p class="flow-status" id="donation-status">Click to start receiving donation containers</p>
+                        <button class="btn primary" id="simple-donations" onclick="window.testDonations()">📥 Generate Test Containers</button>
+                        <p class="flow-status" id="donation-status">Click to test container generation</p>
                     </div>
 
                     <!-- Incoming Donation Containers -->

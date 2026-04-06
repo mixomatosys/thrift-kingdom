@@ -1094,6 +1094,51 @@ function startDonationTimer() {
     }, 100); // Update every 100ms for smooth progress bar
 }
 
+// Simple test function to bypass complex logic
+function testDonations() {
+    console.log('=== SIMPLE TEST FUNCTION ===');
+    
+    // Clear existing containers
+    gameState.donationContainers = [];
+    
+    // Create one simple test container
+    const testContainer = {
+        id: Date.now(),
+        icon: '📦',
+        title: 'Test Container',
+        description: 'Simple test container',
+        itemCount: 5,
+        items: [
+            { id: 1, name: 'Test Item 1', emoji: '📺', value: 10, rarity: 'common', condition: 'good' },
+            { id: 2, name: 'Test Item 2', emoji: '👕', value: 15, rarity: 'common', condition: 'excellent' }
+        ]
+    };
+    
+    gameState.donationContainers.push(testContainer);
+    console.log('Created test container:', testContainer);
+    
+    // Try to update display
+    const container = document.getElementById('donation-containers');
+    if (container) {
+        console.log('Found container element, updating...');
+        container.innerHTML = `
+            <div class="donation-container" onclick="alert('Container clicked!')">
+                <span class="container-icon">📦</span>
+                <div class="container-title">Test Container</div>
+                <div class="container-desc">Simple test container</div>
+                <div class="container-items">5 items</div>
+            </div>
+        `;
+        console.log('✅ Display updated successfully!');
+        
+        const statusEl = document.getElementById('donation-status');
+        if (statusEl) statusEl.textContent = '✅ Test container generated!';
+        
+    } else {
+        console.error('❌ Could not find donation-containers element');
+    }
+}
+
 // Export functions for use in other modules
 window.gameState = gameState;
 window.CONFIG = CONFIG;
@@ -1107,3 +1152,4 @@ window.sellDirectly = sellDirectly;
 window.openDonationContainer = openDonationContainer;
 window.toggleDonationFlow = toggleDonationFlow;
 window.updateDonationToggleUI = updateDonationToggleUI;
+window.testDonations = testDonations;
