@@ -27,9 +27,7 @@ let gameState = {
     },
     
     // Donation flow management
-    donationsOpen: false,      // Whether donations are flowing
-    nextDonationTime: 0,       // When next donation arrives
-    donationInterval: 45000,   // 45 seconds between donations
+    donationsOpen: false,      // Whether donations are open for business
     
     storageCapacity: 50,
     
@@ -101,6 +99,7 @@ function initializeGame() {
     
     // Initial UI update
     updateUI();
+    updateDonationButton();
     
     console.log('🎮 Game initialized successfully!');
 }
@@ -797,7 +796,24 @@ function setupSimpleDonationListeners() {
 
 // These complex functions removed - using simplified approach above
 
-// Simplified donation system that actually works
+// Toggle donation system
+function toggleDonations() {
+    console.log('=== TOGGLING DONATIONS ===');
+    
+    if (gameState.donationsOpen) {
+        // Close donations
+        gameState.donationsOpen = false;
+        updateDonationButton();
+        showNotification('📦 Donation flow closed.');
+    } else {
+        // Open donations
+        gameState.donationsOpen = true;
+        updateDonationButton();
+        openDonations();
+    }
+}
+
+// Generate donation containers
 function openDonations() {
     console.log('=== OPENING DONATIONS ===');
     
@@ -1021,22 +1037,23 @@ function finishSorting() {
     gameState.currentSortingIndex = 0;
     gameState.currentSortingItem = null;
     
-    // Hide sorting interface
-    const sortingContent = document.querySelector('.sorting-content');
-    if (sortingContent) {
-        sortingContent.style.display = 'none';
+    // Hide only the sorting interface part, keep category areas visible
+    const sortingInterface = document.querySelector('.sorting-interface');
+    if (sortingInterface) {
+        sortingInterface.style.display = 'none';
     }
     
-    // Reset item display
-    const itemDisplay = document.getElementById('current-item');
-    if (itemDisplay) {
-        itemDisplay.innerHTML = `
-            <div class="placeholder-content">
-                <span class="placeholder-icon">📦</span>
-                <div class="placeholder-text">Open a donation container to start sorting</div>
-            </div>
-        `;
+    // Hide container info
+    const containerInfo = document.querySelector('.container-info');
+    if (containerInfo) {
+        containerInfo.style.display = 'none';
     }
+    
+    // Update workspace header
+    const workspaceHeader = document.querySelector('.workspace-header h3');
+    const workspaceDesc = document.querySelector('.workspace-header p');
+    if (workspaceHeader) workspaceHeader.textContent = '✅ Sorting Complete';
+    if (workspaceDesc) workspaceDesc.textContent = 'Items sorted into categories. Click "Move to Stock" when ready.';
     
     showNotification('✅ Finished sorting! Items organized by category.');
 }
@@ -1110,6 +1127,23 @@ function updateCategoryDisplay() {
     });
 }
 
+function updateDonationButton() {
+    const button = document.getElementById('toggle-donations');
+    const status = document.getElementById('donation-status');
+    
+    if (!button) return;
+    
+    if (gameState.donationsOpen) {
+        button.textContent = '📦 Close Donations';
+        button.classList.add('donations-open');
+        if (status) status.textContent = '🟢 Donations open! Click button to generate containers.';
+    } else {
+        button.textContent = '📥 Open Donations';
+        button.classList.remove('donations-open');
+        if (status) status.textContent = 'Click to start receiving donation containers';
+    }
+}
+
 // Export functions for use in other modules
 window.gameState = gameState;
 window.CONFIG = CONFIG;
@@ -1120,7 +1154,7 @@ window.moveToAppraisal = moveToAppraisal;
 window.moveToStock = moveToStock;
 window.moveToDisplay = moveToDisplay;
 window.sellDirectly = sellDirectly;
-window.openDonations = openDonations;
+window.toggleDonations = toggleDonations;
 window.openContainer = openContainer;
 window.sortItemToCategory = sortItemToCategory;
 window.tossCurrentItem = tossCurrentItem;
